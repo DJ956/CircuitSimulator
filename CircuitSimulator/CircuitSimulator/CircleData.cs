@@ -21,7 +21,12 @@ namespace CircuitSimulator
 
         public override string ToString()
         {
-            return $"INDEX:{Index} TYPE:{CircuitType} INPUTS:({Inputs}) OUTS:({Outs})";
+            var inputstr = "";
+            foreach (var input in Inputs) { inputstr += input + " "; }
+            var outputstr = "";
+            foreach (var output in Outs) { outputstr += output + " "; }
+
+            return $"INDEX:{Index} TYPE:{CircuitType} INPUTS:({inputstr}) OUTS:({outputstr.ToString()})";
         }
     }
 }

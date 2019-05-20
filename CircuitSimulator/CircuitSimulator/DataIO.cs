@@ -23,11 +23,11 @@ namespace CircuitSimulator
         /// <returns></returns>
         public static List<List<int>> LoadCircleFromTxt(string fileName)
         {
-            var path = Path.Combine(ROOT, fileName);            
+            var path = Path.Combine(ROOT, fileName);
 
             List<List<int>> result = null;
 
-            using(var reader = new StreamReader(path, false))
+            using (var reader = new StreamReader(path, false))
             {
                 var count = int.Parse(reader.ReadLine());
                 result = new List<List<int>>(count);
@@ -54,12 +54,37 @@ namespace CircuitSimulator
         /// <param name="inputs"></param>
         public static List<int> LoadCircleInputFromTxt(string fileName)
         {
-            var result = new List<int>();
+            List<int> result = null;
             var path = Path.Combine(ROOT, fileName);
-            using(var reader = new StreamReader(path, false))
+            using (var reader = new StreamReader(path, false))
             {
                 var line = "";
-                while((line = reader.ReadLine()) != null)
+                var count = int.Parse(reader.ReadLine());
+                result = new List<int>(count);
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var data = int.Parse(line);
+                    result.Add(data);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// txtから外部出力線を読み込む
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static List<int> LoadCircleOutputFromTxt(string fileName)
+        {
+            List<int> result = null;
+            var path = Path.Combine(ROOT, fileName);
+            using (var reader = new StreamReader(path, false))
+            {
+                var line = "";
+                var count = int.Parse(reader.ReadLine());
+                result = new List<int>(count);
+                while ((line = reader.ReadLine()) != null)
                 {
                     var data = int.Parse(line);
                     result.Add(data);

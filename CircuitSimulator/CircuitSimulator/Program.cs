@@ -10,9 +10,9 @@ namespace CircuitSimulator
             Console.WriteLine("Hello World!");
 
             //ファイルパス入力
-            Console.WriteLine("Enter table(*.tbl)...");
+            Console.WriteLine("テーブルファイル名を入力してください(*.tbl)...");
             var tableFileName = Console.ReadLine();            
-            Console.WriteLine("Enter pattern(*.pat)...");
+            Console.WriteLine("パターンファイル名を入力してください(*.pat)...");
             var patternFileName = Console.ReadLine();
 
             //データ入力
@@ -37,9 +37,7 @@ namespace CircuitSimulator
 
             outputFileName = tableFileName.Replace(".tbl", ".txt");
             DataIO.SaveCircleDataAsync(circles, outputFileName).Wait();
-            Console.WriteLine($"シミュレーション済み回路データを{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました。");
-            
-            
+            Console.WriteLine($"シミュレーション済み回路データを{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました。");                        
         }
     }
 }

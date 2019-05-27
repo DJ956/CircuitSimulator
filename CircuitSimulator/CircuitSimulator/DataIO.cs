@@ -108,5 +108,25 @@ namespace CircuitSimulator
         {
             return LoadCircleFromTxt(fileName);
         }
+
+        /// <summary>
+        /// 論理シミュレータの出力結果を保存する
+        /// </summary>
+        /// <param name="results"></param>
+        /// <param name="fileName"></param>
+        public async static void SaveResultAsync(List<CircleData> results, string fileName)
+        {
+            var path = Path.Combine(ROOT, fileName);
+            using(var writer = new StreamWriter(path, false))
+            {
+                foreach(var c in results)
+                {
+                    var v = c.Value ? 1 : 0;
+                    await writer.WriteAsync(v.ToString());
+                    await writer.WriteAsync(" ");
+                }
+                await writer.FlushAsync();
+            }
+        }
     }
 }

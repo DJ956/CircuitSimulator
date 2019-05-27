@@ -25,8 +25,10 @@ namespace CircuitSimulator
         {
             var inputstr = "";
             foreach (var input in Inputs) { inputstr += input + " "; }
+            inputstr = inputstr.TrimEnd();
             var outputstr = "";
             foreach (var output in Outs) { outputstr += output + " "; }
+            outputstr = outputstr.TrimEnd();
             var a = Already ? 1 : 0;
             var v = Value ? 1 : 0;
             return $"INDEX:{Index} TYPE:{CircuitType} INPUTS:({inputstr}) OUTS:({outputstr.ToString()}) Already:{a} Value:{v}";

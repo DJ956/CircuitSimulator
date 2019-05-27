@@ -11,11 +11,14 @@ namespace CircuitSimulator
 
             var builder = new CircleDataBuilder();
             var circles = builder.BuildCircles("circles.txt");
-
+            
             foreach(var circle in circles)
             {
                 Console.WriteLine(circle.ToString());
             }
+
+            var pathFinder = new CircuitPathFinder();
+            pathFinder.FindPath(circles);
         }
     }
 }

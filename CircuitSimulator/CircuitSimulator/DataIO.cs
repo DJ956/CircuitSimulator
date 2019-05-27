@@ -35,6 +35,7 @@ namespace CircuitSimulator
                 var line = "";
                 while ((line = reader.ReadLine()) != null)
                 {
+                    line = line.TrimStart();
                     var lines = line.Split(SPLIT);
                     var row = new List<int>(lines.Length);
                     foreach (var str in lines)
@@ -75,7 +76,7 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static List<int> LoadCircleOutputFromTxt(string fileName)
+        public static List<int> LoadCircleOutSideInputsFromTxt(string fileName)
         {
             List<int> result = null;
             var path = Path.Combine(ROOT, fileName);
@@ -91,6 +92,21 @@ namespace CircuitSimulator
                 }
             }
             return result;
+        }
+
+        public static List<int> LoadCircleOutsideOutputsFromTxt(string fileName)
+        {
+            return LoadCircleOutSideInputsFromTxt(fileName);
+        }
+
+        /// <summary>
+        /// 入力パターン読み込む
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static List<List<int>> LoadCirclePatternesFromTxt(string fileName)
+        {
+            return LoadCircleFromTxt(fileName);
         }
     }
 }

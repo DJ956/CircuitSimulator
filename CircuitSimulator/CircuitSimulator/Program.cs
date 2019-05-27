@@ -7,23 +7,27 @@ namespace CircuitSimulator
         public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-
-            var patternes = CirclePatternes.Patternes;
+            
             var builder = new CircleDataBuilder();
             var pathFinder = new CircuitPathFinder();
 
-            var circles = builder.BuildCirclesAsync("circles.txt").Result;
+            var circleRawData = DataIO.LoadTableAsync("ex5.tbl").Result;
+
+            var circleInputs = circleRawData.CircleInputs;
+            var circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
 
             foreach (var circle in circles)
             {
                 Console.WriteLine(circle.ToString());
             }
-
-            for (int i = 0; i < patternes.Count; i++)
+            
+            var circlePatternes = DataIO.LoadCirclePatternesFromTxtAsync("ex5.pat").Result;
+            for (int i = 0; i < circlePatternes.Patternes.Count; i++)
             {
-                var result = pathFinder.Simulation(circles, patternes, i);
+                var result = pathFinder.Simulation(circles, circlePatternes, i);
                 DataIO.SaveResultAsync(result, "result.txt").Wait();
             }
+            
         }
     }
 }

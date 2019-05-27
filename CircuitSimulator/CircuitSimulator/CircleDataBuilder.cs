@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CircuitSimulator
 {
@@ -19,9 +18,9 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async Task<List<CircleData>> BuildCirclesAsync(string fileName)
+        public List<CircleData> BuildCircles(List<List<int>> circleRaw, CircleInputs circleInputs)
         {
-            var data = await DataIO.LoadCircleFromTxtAsync(fileName);
+            var data = circleRaw;
             var result = new List<CircleData>(data.Count);
 
             var index = 1;
@@ -39,7 +38,7 @@ namespace CircuitSimulator
                     var start = list[INPUT_INDEX] - 1;
                     for (int i = 0; i < inputCount; i++)
                     {
-                        inputs[i] = CircleInputs.Inputs[start + i];
+                        inputs[i] = circleInputs.Inputs[start + i];
                     }
                 }//1の時、3列目は入力数を示す
                 else { inputs = new int[1] { list[INPUT_INDEX] }; }
@@ -52,7 +51,7 @@ namespace CircuitSimulator
                     var start = list[OUT_INDEX] - 1;
                     for (int i = 0; i < outCount; i++)
                     {
-                        outs[i] = CircleInputs.Inputs[start + i];
+                        outs[i] = circleInputs.Inputs[start + i];
                     }
                 }//1の時、５列目は出力数を示す
                 else { outs = new int[1] { list[OUT_INDEX] }; }

@@ -9,7 +9,7 @@ namespace CircuitSimulator
     {
         public static readonly string ROOT = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             "Circle");
-        private static readonly string SPLIT = " ";
+        private static readonly string SPLIT = "	";
 
         static DataIO()
         {
@@ -17,33 +17,54 @@ namespace CircuitSimulator
         }
 
         /// <summary>
+        /// テーブルデータを読み込む(*.tbl)
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public async static Task<CirclesRawData> LoadTableAsync(string fileName)
+        {
+            var path = Path.Combine(ROOT, fileName);
+            using(var reader = new StreamReader(path, false))
+            {
+                var circleRaw = await LoadCircleFromTxtAsync(reader);
+                var inputs = await LoadCircleInputFromTxtAsync(reader);
+                var outsideInputs = await LoadCircleOutSideInputsFromTxtAsync(reader);
+                var outsideOutputs = await LoadCircleOutsideOutputsFromTxtAsync(reader);
+
+                return new CirclesRawData(circleRaw, inputs, outsideInputs, outsideOutputs);
+            }
+        }
+
+
+        /// <summary>
         /// リスト1の回路データを読み込む
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task<List<List<int>>> LoadCircleFromTxtAsync(string fileName)
+        private async static Task<List<List<int>>> LoadCircleFromTxtAsync(StreamReader reader)
         {
-            var path = Path.Combine(ROOT, fileName);
-
             List<List<int>> result = null;
 
-            using (var reader = new StreamReader(path, false))
-            {
-                var count = int.Parse(await reader.ReadLineAsync());
-                result = new List<List<int>>(count);
+            //最初の空行を読み飛ばす
+            await reader.ReadLineAsync();
+            //データ数読み取り
+            var count = int.Parse(await reader.ReadLineAsync());
+            result = new List<List<int>>(count);
 
-                var line = "";
-                while ((line = await reader.ReadLineAsync()) != null)
+            for (int i = 0; i < count; i++)
+            {
+                var line = await reader.ReadLineAsync();
+                //データ加工
+                line = line.TrimStart();
+                var lines = line.Split(SPLIT);
+
+                var row = new List<int>(lines.Length);
+                foreach (var str in lines)
                 {
-                    line = line.TrimStart();
-                    var lines = line.Split(SPLIT);
-                    var row = new List<int>(lines.Length);
-                    foreach (var str in lines)
-                    {
-                        row.Add(int.Parse(str));
-                    }
-                    result.Add(row);
+                    row.Add(int.Parse(str));
                 }
+                result.Add(row);
+
             }
             return result;
         }
@@ -53,21 +74,23 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="inputs"></param>
-        public async static Task<List<int>> LoadCircleInputFromTxtAsync(string fileName)
+        private async static Task<List<int>> LoadCircleInputFromTxtAsync(StreamReader reader)
         {
             List<int> result = null;
-            var path = Path.Combine(ROOT, fileName);
-            using (var reader = new StreamReader(path, false))
+            //最初の空行を読み飛ばす
+            await reader.ReadLineAsync();
+
+            var count = int.Parse(await reader.ReadLineAsync());
+            result = new List<int>(count);
+            for(int i = 0; i < count; i++)
             {
-                var line = "";
-                var count = int.Parse(await reader.ReadLineAsync());
-                result = new List<int>(count);
-                while ((line = await reader.ReadLineAsync()) != null)
-                {
-                    var data = int.Parse(line);
-                    result.Add(data);
-                }
+                var line = await reader.ReadLineAsync();
+                line = line.TrimStart();
+
+                var data = int.Parse(line);
+                result.Add(data);
             }
+
             return result;
         }
 
@@ -76,22 +99,9 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task<List<int>> LoadCircleOutSideInputsFromTxtAsync(string fileName)
+        private async static Task<List<int>> LoadCircleOutSideInputsFromTxtAsync(StreamReader reader)
         {
-            List<int> result = null;
-            var path = Path.Combine(ROOT, fileName);
-            using (var reader = new StreamReader(path, false))
-            {
-                var line = "";
-                var count = int.Parse(await reader.ReadLineAsync());
-                result = new List<int>(count);
-                while ((line = await reader.ReadLineAsync()) != null)
-                {
-                    var data = int.Parse(line);
-                    result.Add(data);
-                }
-            }
-            return result;
+            return await LoadCircleInputFromTxtAsync(reader);
         }
 
         /// <summary>
@@ -99,9 +109,9 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task<List<int>> LoadCircleOutsideOutputsFromTxtAsync(string fileName)
+        private async static Task<List<int>> LoadCircleOutsideOutputsFromTxtAsync(StreamReader reader)
         {
-            return await LoadCircleOutSideInputsFromTxtAsync(fileName);
+            return await LoadCircleOutSideInputsFromTxtAsync(reader);
         }
 
         /// <summary>
@@ -109,9 +119,31 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task<List<List<int>>> LoadCirclePatternesFromTxtAsync(string fileName)
+        public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName)
         {
-            return await LoadCircleFromTxtAsync(fileName);
+            List<List<int>> results = null;
+
+            char split = ' ';
+            var path = Path.Combine(ROOT, fileName);
+            using(var reader = new StreamReader(path, false))
+            {
+                var count = int.Parse(await reader.ReadLineAsync());
+                results = new List<List<int>>(count);
+
+                for(int i = 0; i < count; i++)
+                {
+                    var line = await reader.ReadLineAsync();
+                    line = line.TrimStart();
+                    var lines = line.Split(split);
+                    var row = new List<int>(lines.Length);
+                    foreach(var str in lines)
+                    {
+                        row.Add(int.Parse(str));
+                    }
+                    results.Add(row);
+                }
+            }
+            return new CirclePatternes(results);
         }
 
         /// <summary>

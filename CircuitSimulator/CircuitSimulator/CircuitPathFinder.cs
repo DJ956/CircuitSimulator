@@ -13,7 +13,7 @@ namespace CircuitSimulator
         /// <param name="circles"></param>
         /// <param name="patternes"></param>
         /// <param name="selectPatternIndex"></param>
-        private void Initialize(List<CircleData> circles, List<List<int>> patternes, int selectPatternIndex)
+        private void Initialize(List<CircleData> circles, CirclePatternes circlePatternes, int selectPatternIndex)
         {
             //回路データの値の初期化
             foreach(var c in circles)
@@ -23,9 +23,9 @@ namespace CircuitSimulator
             }
 
             //外部入力値設定
-            for (int i = 0; i < patternes[selectPatternIndex].Count; i++)
+            for (int i = 0; i < circlePatternes.Patternes[selectPatternIndex].Count; i++)
             {
-                if (patternes[selectPatternIndex][i] == 0)
+                if (circlePatternes.Patternes[selectPatternIndex][i] == 0)
                 {
                     circles[i].Value = false;
                 }
@@ -189,9 +189,9 @@ namespace CircuitSimulator
         /// <param name="patternes">入力パターン</param>
         /// <param name="selectPatternIndex">パターンの選択番号</param>
         /// <returns>論理回路の出力結果</returns>
-        public List<CircleData> Simulation(List<CircleData> circles, List<List<int>> patternes, int selectPatternIndex)
+        public List<CircleData> Simulation(List<CircleData> circles, CirclePatternes circlePatternes, int selectPatternIndex)
         {     
-            Initialize(circles, patternes, selectPatternIndex);
+            Initialize(circles, circlePatternes, selectPatternIndex);
            
             for (int i = 0; i < circles.Count; i++)
             {

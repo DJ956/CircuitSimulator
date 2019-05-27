@@ -21,7 +21,6 @@ namespace CircuitSimulator
                 c.Already = false;
                 c.Value = false;
             }
-
             //外部入力値設定
             for (int i = 0; i < circlePatternes.Patternes[selectPatternIndex].Count; i++)
             {
@@ -35,11 +34,27 @@ namespace CircuitSimulator
                 }
                 circles[i].Already = true;
             }
-            /*
-            Console.WriteLine("Pattern = ");
-            patternes[selectPatternIndex].ForEach(p => { Console.Write(p + " "); });
-            Console.WriteLine("");
-            */
+        }
+
+        private bool[] SelectInputs(List<CircleData> circles, int i)
+        {
+            var inputsIndexes = circles[i].Inputs;//入力のindexたち
+            var inputsValues = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
+            for (int j = 0; j < inputsValues.Length; j++)
+            {
+                var index = inputsIndexes[j] - 1;
+                if (circles[index].Already)
+                {
+                    inputsValues[j] = circles[index].Value;
+                }
+                else
+                {
+                    //FindPath(circles, index);
+                    Console.WriteLine($"Not Already:{index + 1} Occuresed:{i + 1} AND");
+                }
+            }
+
+            return inputsValues;
         }
 
         /// <summary>
@@ -76,22 +91,7 @@ namespace CircuitSimulator
                 //AND
                 case CircuitType.AND:
                     {
-                        var inputsIndexes = circles[i].Inputs;//入力のindexたち
-                        var inputsValues = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
-                        for (int j = 0; j < inputsValues.Length; j++)
-                        {
-                            var index = inputsIndexes[j] - 1;
-                            if (circles[index].Already)
-                            {
-                                inputsValues[j] = circles[index].Value;
-                            }
-                            else
-                            {
-                                //FindPath(circles, index);
-                                Console.WriteLine($"Not Already:{index+1} Occuresed:{i+1} AND");
-                            }
-                        }
-
+                        var inputsValues = SelectInputs(circles, i);
                         circles[i].Value = CircuitFunction.AND(inputsValues);
                         circles[i].Already = true;
 
@@ -99,24 +99,9 @@ namespace CircuitSimulator
                     }
                 //OR
                 case CircuitType.OR:
-                    {                        
-                        var inputsIndexes = circles[i].Inputs;//入力のindexたち
-                        var inputsValue = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
-                        for (int j = 0; j < inputsIndexes.Length; j++)
-                        {
-                            var index = inputsIndexes[j] - 1;
-                            if (circles[index].Already)
-                            {
-                                inputsValue[j] = circles[index].Value;
-                            }
-                            else
-                            {
-                                //FindPath(circles, index);
-                                Console.WriteLine($"Not Already:{index+1} Occuresed:{i+1} OR");
-                            }
-                        }
-
-                        circles[i].Value = CircuitFunction.OR(inputsValue);
+                    {
+                        var inputsValues = SelectInputs(circles, i);
+                        circles[i].Value = CircuitFunction.OR(inputsValues);
                         circles[i].Already = true;
                         break;
                     }
@@ -139,23 +124,16 @@ namespace CircuitSimulator
                 //NAND
                 case CircuitType.NAND:
                     {
-                        var inputsIndexes = circles[i].Inputs;//入力のindexたち
-                        var inputsValue = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
-                        for (int j = 0; j < inputsIndexes.Length; j++)
-                        {
-                            var index = inputsIndexes[j] - 1;                            
-                            if (circles[index].Already)
-                            {
-                                inputsValue[j] = circles[index].Value;
-                            }
-                            else
-                            {
-                                //FindPath(circles, index);
-                                Console.WriteLine($"Not Already:{index+1} Occuresed:{i+1} NAND");
-                            }
-                        }
-
-                        circles[i].Value = CircuitFunction.NAND(inputsValue);
+                        var inputsValues = SelectInputs(circles, i);
+                        circles[i].Value = CircuitFunction.NAND(inputsValues);
+                        circles[i].Already = true;
+                        break;
+                    }
+                    //NOR
+                case CircuitType.NOR:
+                    {
+                        var inputsValues = SelectInputs(circles, i);
+                        circles[i].Value = CircuitFunction.NOR(inputsValues);
                         circles[i].Already = true;
                         break;
                     }

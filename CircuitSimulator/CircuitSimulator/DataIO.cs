@@ -24,15 +24,25 @@ namespace CircuitSimulator
         public async static Task<CirclesRawData> LoadTableAsync(string fileName)
         {
             var path = Path.Combine(ROOT, fileName);
-            using(var reader = new StreamReader(path, false))
+            CirclesRawData result = null;
+            try
             {
-                var circleRaw = await LoadCircleFromTxtAsync(reader);
-                var inputs = await LoadCircleInputFromTxtAsync(reader);
-                var outsideInputs = await LoadCircleOutSideInputsFromTxtAsync(reader);
-                var outsideOutputs = await LoadCircleOutsideOutputsFromTxtAsync(reader);
+                using (var reader = new StreamReader(path, false))
+                {
+                    var circleRaw = await LoadCircleFromTxtAsync(reader);
+                    var inputs = await LoadCircleInputFromTxtAsync(reader);
+                    var outsideInputs = await LoadCircleOutSideInputsFromTxtAsync(reader);
+                    var outsideOutputs = await LoadCircleOutsideOutputsFromTxtAsync(reader);
 
-                return new CirclesRawData(circleRaw, inputs, outsideInputs, outsideOutputs);
+                    result = new CirclesRawData(circleRaw, inputs, outsideInputs, outsideOutputs);
+                }
             }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+                Environment.Exit(-1);
+            }
+            return result;
         }
 
 
@@ -122,26 +132,33 @@ namespace CircuitSimulator
         public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName)
         {
             List<List<int>> results = null;
-
-            char split = ' ';
-            var path = Path.Combine(ROOT, fileName);
-            using(var reader = new StreamReader(path, false))
+            try
             {
-                var count = int.Parse(await reader.ReadLineAsync());
-                results = new List<List<int>>(count);
-
-                for(int i = 0; i < count; i++)
+                char split = ' ';
+                var path = Path.Combine(ROOT, fileName);
+                using (var reader = new StreamReader(path, false))
                 {
-                    var line = await reader.ReadLineAsync();
-                    line = line.TrimStart();
-                    var lines = line.Split(split);
-                    var row = new List<int>(lines.Length);
-                    foreach(var str in lines)
+                    var count = int.Parse(await reader.ReadLineAsync());
+                    results = new List<List<int>>(count);
+
+                    for (int i = 0; i < count; i++)
                     {
-                        row.Add(int.Parse(str));
+                        var line = await reader.ReadLineAsync();
+                        line = line.TrimStart();
+                        var lines = line.Split(split);
+                        var row = new List<int>(lines.Length);
+                        foreach (var str in lines)
+                        {
+                            row.Add(int.Parse(str));
+                        }
+                        results.Add(row);
                     }
-                    results.Add(row);
                 }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+                Environment.Exit(-1);
             }
             return new CirclePatternes(results);
         }
@@ -154,16 +171,24 @@ namespace CircuitSimulator
         public async static Task SaveResultAsync(List<CircleData> result, string fileName)
         {
             var path = Path.Combine(ROOT, fileName);
-            using (var writer = new StreamWriter(path, true))
+            try
             {
-                foreach (var c in result)
+                using (var writer = new StreamWriter(path, true))
                 {
-                    var v = c.Value ? 1 : 0;
-                    await writer.WriteAsync(v.ToString());
-                    await writer.WriteAsync(" ");
+                    foreach (var c in result)
+                    {
+                        var v = c.Value ? 1 : 0;
+                        await writer.WriteAsync(" ");
+                        await writer.WriteAsync(v.ToString());
+                        await writer.WriteAsync(" ");
+                    }
+                    await writer.WriteLineAsync("");
+                    await writer.FlushAsync();
                 }
-                await writer.WriteLineAsync("");
-                await writer.FlushAsync();
+            }catch(IOException ex)
+            {
+                Console.WriteLine($"ファイルの書き込みに失敗しました\n" + ex.Message);
+                Environment.Exit(-1);
             }
         }
     }

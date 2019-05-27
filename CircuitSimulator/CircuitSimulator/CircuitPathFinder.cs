@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CircuitSimulator.gate;
+using System;
 using System.Collections.Generic;
 
 namespace CircuitSimulator
@@ -8,7 +9,7 @@ namespace CircuitSimulator
         public CircuitPathFinder() { }
 
         /// <summary>
-        /// 入力パターン選択
+        /// 入力パターン選択,CircleDataのValue,Alreadyの初期化
         /// </summary>
         /// <param name="circles"></param>
         /// <param name="patternes"></param>
@@ -36,6 +37,12 @@ namespace CircuitSimulator
             }
         }
 
+        /// <summary>
+        /// CircleDataの入力Indexが格納されている配列からそれらの値を摘出します。
+        /// </summary>
+        /// <param name="circles"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
         private bool[] SelectInputs(List<CircleData> circles, int i)
         {
             var inputsIndexes = circles[i].Inputs;//入力のindexたち
@@ -47,117 +54,23 @@ namespace CircuitSimulator
                 {
                     inputsValues[j] = circles[index].Value;
                 }
-                else
-                {
-                    //FindPath(circles, index);
-                    Console.WriteLine($"Not Already:{index + 1} Occuresed:{i + 1} AND");
-                }
+                else { throw new Exception($"パス:{index + 1}が処理されていないまま{i + 1}の処理を行ううとしています。"); }
             }
 
             return inputsValues;
         }
 
         /// <summary>
-        /// 
+        /// CircleDataの値を決定し、処理済みのフラグを立てる。
         /// </summary>
         /// <param name="circles"></param>
         /// <param name="i"></param>
         private void FindPath(List<CircleData> circles, int i)
         {
             var type = circles[i].CircuitType;
-
-            switch (type)
-            {
-                case CircuitType.PI:
-                    {
-                        break;
-                    }
-                //枝
-                case CircuitType.branch:
-                    {
-                        var index = circles[i].Inputs[0] - 1;
-                        if (circles[index].Already)
-                        {
-                            circles[i].Value = circles[index].Value;
-                            circles[i].Already = true;
-                        }
-                        else
-                        {
-                            //FindPath(circles, index);
-                            Console.WriteLine($"Not Already:{index+1} Occuresed:{i+1} Branch");
-                        }
-                        break;
-                    }
-                //AND
-                case CircuitType.AND:
-                    {
-                        var inputsValues = SelectInputs(circles, i);
-                        circles[i].Value = CircuitFunction.AND(inputsValues);
-                        circles[i].Already = true;
-
-                        break;
-                    }
-                //OR
-                case CircuitType.OR:
-                    {
-                        var inputsValues = SelectInputs(circles, i);
-                        circles[i].Value = CircuitFunction.OR(inputsValues);
-                        circles[i].Already = true;
-                        break;
-                    }
-                //NOT
-                case CircuitType.NOT:
-                    {
-                        var index = circles[i].Inputs[0] - 1;
-                        if (circles[index].Already)
-                        {
-                            circles[i].Value = CircuitFunction.NOT(circles[index].Value);
-                            circles[i].Already = true;
-                        }
-                        else
-                        {
-                            //FindPath(circles, index);
-                            Console.WriteLine($"Not Already:{index+1} Occuresed:{i+1} NOT");
-                        }
-                        break;
-                    }
-                //NAND
-                case CircuitType.NAND:
-                    {
-                        var inputsValues = SelectInputs(circles, i);
-                        circles[i].Value = CircuitFunction.NAND(inputsValues);
-                        circles[i].Already = true;
-                        break;
-                    }
-                    //NOR
-                case CircuitType.NOR:
-                    {
-                        var inputsValues = SelectInputs(circles, i);
-                        circles[i].Value = CircuitFunction.NOR(inputsValues);
-                        circles[i].Already = true;
-                        break;
-                    }
-                    //出力
-                case CircuitType.PO:
-                    {
-                        var index = circles[i].Inputs[0] - 1;
-                        if (circles[index].Already)
-                        {
-                            circles[i].Value = circles[index].Value;
-                            circles[i].Already = true;
-                        }
-                        else
-                        {
-                            //FindPath(circles, index);
-                            Console.WriteLine($"Not Already:{index+1} Occuresed:{i+1} PO");
-                        }
-                        break;
-                    }
-                default:
-                    {
-                        throw new Exception("Not found Gate process");                        
-                    }
-            }
+            var inputs = SelectInputs(circles, i);
+            circles[i].Value = GateFunctions.Execute(type, inputs);
+            circles[i].Already = true;
         }
 
         /// <summary>
@@ -178,12 +91,9 @@ namespace CircuitSimulator
             
             //出力のみを取得する
             var result = new List<CircleData>();
-            foreach(var c in circles)
+            foreach (var c in circles)
             {
-                if(c.CircuitType == CircuitType.PO)
-                {
-                    result.Add(c);
-                }
+                if (c.CircuitType == CircuitType.PO) { result.Add(c); }
             }
 
             result.Sort((a, b) => a.Inputs[0] - b.Inputs[0]);

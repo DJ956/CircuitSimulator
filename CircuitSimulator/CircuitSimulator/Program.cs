@@ -23,10 +23,6 @@ namespace CircuitSimulator
             var circleInputs = circleRawData.CircleInputs;
             var circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
 
-            foreach(var c in circles)
-            {
-                Console.WriteLine(c.ToString());
-            }
 
             //シミュレーション実行&結果出力
             var outputFileName = tableFileName.Replace(".tbl", "");
@@ -37,8 +33,12 @@ namespace CircuitSimulator
                 var result = pathFinder.Simulation(circles, circlePatternes, i);
                 DataIO.SaveResultAsync(result, outputFileName).Wait();
             }
+            Console.WriteLine($"シミュレーション結果を{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました。");
 
-            Console.WriteLine($"Save result:{Path.Combine(DataIO.ROOT, outputFileName)}");
+            outputFileName = tableFileName.Replace(".tbl", ".txt");
+            DataIO.SaveCircleDataAsync(circles, outputFileName).Wait();
+            Console.WriteLine($"シミュレーション済み回路データを{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました。");
+            
             
         }
     }

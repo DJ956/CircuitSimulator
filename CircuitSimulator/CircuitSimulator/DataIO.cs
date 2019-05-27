@@ -164,6 +164,32 @@ namespace CircuitSimulator
         }
 
         /// <summary>
+        /// シミュレーション済みやロードした回路データを出力します。
+        /// </summary>
+        /// <param name="circles"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public async static Task SaveCircleDataAsync(List<CircleData> circles, string fileName)
+        {
+            var path = Path.Combine(ROOT, fileName);
+            try
+            {
+                using(var writer = new StreamWriter(path, false))
+                {
+                    foreach(var c in circles)
+                    {
+                        await writer.WriteLineAsync(c.ToString());
+                    }
+                    await writer.FlushAsync();
+                }
+            }catch(IOException ex)
+            {
+                Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
+                Environment.Exit(-1);
+            }
+        }
+
+        /// <summary>
         /// 論理シミュレータの出力結果を保存する
         /// </summary>
         /// <param name="results"></param>
@@ -171,14 +197,14 @@ namespace CircuitSimulator
         public async static Task SaveResultAsync(List<CircleData> result, string fileName)
         {
             var path = Path.Combine(ROOT, fileName);
+            
             try
             {
                 using (var writer = new StreamWriter(path, true))
                 {
                     foreach (var c in result)
                     {
-                        var v = c.Value ? 1 : 0;
-                        await writer.WriteAsync(" ");
+                        var v = c.Value ? 1 : 0;                        
                         await writer.WriteAsync(v.ToString());
                         await writer.WriteAsync(" ");
                     }
@@ -187,7 +213,7 @@ namespace CircuitSimulator
                 }
             }catch(IOException ex)
             {
-                Console.WriteLine($"ファイルの書き込みに失敗しました\n" + ex.Message);
+                Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
                 Environment.Exit(-1);
             }
         }

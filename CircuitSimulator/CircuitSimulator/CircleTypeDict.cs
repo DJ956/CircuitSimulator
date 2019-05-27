@@ -24,6 +24,11 @@ namespace CircuitSimulator
             TypeMap.Add(9, CircuitType.unuse);
         }
 
+        /// <summary>
+        /// 生データの数値から列挙型に変換する
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static CircuitType GetType(int code)
         {
             return TypeMap[code];

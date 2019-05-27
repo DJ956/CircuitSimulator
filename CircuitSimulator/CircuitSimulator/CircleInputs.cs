@@ -14,7 +14,7 @@ namespace CircuitSimulator
         static CircleInputs()
         {
             Inputs = new List<int>();
-            Inputs = DataIO.LoadCircleInputFromTxt(FILENAME);
+            Inputs = DataIO.LoadCircleInputFromTxtAsync(FILENAME).Result;
         }
     }
 }

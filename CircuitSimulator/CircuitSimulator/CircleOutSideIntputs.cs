@@ -15,7 +15,7 @@ namespace CircuitSimulator
         {
             OutSideInputs = new List<int>();
             var path = Path.Combine(DataIO.ROOT, FILENAME);
-            OutSideInputs = DataIO.LoadCircleOutSideInputsFromTxt(path);
+            OutSideInputs = DataIO.LoadCircleOutSideInputsFromTxtAsync(path).Result;
         }
     }
 }

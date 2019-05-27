@@ -15,7 +15,7 @@ namespace CircuitSimulator
         {
             Patternes = new List<List<int>>();
             var path = Path.Combine(DataIO.ROOT, FILENAME);
-            Patternes = DataIO.LoadCirclePatternesFromTxt(path);
+            Patternes = DataIO.LoadCirclePatternesFromTxtAsync(path).Result;
         }
     }
 }

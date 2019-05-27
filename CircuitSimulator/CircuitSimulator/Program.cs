@@ -1,24 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace CircuitSimulator
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
+            var patternes = CirclePatternes.Patternes;
             var builder = new CircleDataBuilder();
-            var circles = builder.BuildCircles("circles.txt");
-            
-            foreach(var circle in circles)
+            var pathFinder = new CircuitPathFinder();
+
+            var circles = builder.BuildCirclesAsync("circles.txt").Result;
+
+            foreach (var circle in circles)
             {
                 Console.WriteLine(circle.ToString());
             }
 
-            var pathFinder = new CircuitPathFinder();
-            pathFinder.FindPath(circles);
+            for (int i = 0; i < patternes.Count; i++)
+            {
+                var result = pathFinder.Simulation(circles, patternes, i);
+                DataIO.SaveResultAsync(result, "result.txt").Wait();
+            }
         }
     }
 }

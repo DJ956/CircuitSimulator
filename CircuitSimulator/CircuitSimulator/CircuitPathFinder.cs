@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CircuitSimulator
 {
     public class CircuitPathFinder
     {
-        public CircuitPathFinder()
-        {
-
-        }
+        public CircuitPathFinder() { }
 
         /// <summary>
         /// 入力パターン選択
@@ -19,6 +15,14 @@ namespace CircuitSimulator
         /// <param name="selectPatternIndex"></param>
         private void Initialize(List<CircleData> circles, List<List<int>> patternes, int selectPatternIndex)
         {
+            //回路データの値の初期化
+            foreach(var c in circles)
+            {
+                c.Already = false;
+                c.Value = false;
+            }
+
+            //外部入力値設定
             for (int i = 0; i < patternes[selectPatternIndex].Count; i++)
             {
                 if (patternes[selectPatternIndex][i] == 0)
@@ -31,9 +35,11 @@ namespace CircuitSimulator
                 }
                 circles[i].Already = true;
             }
+            /*
             Console.WriteLine("Pattern = ");
             patternes[selectPatternIndex].ForEach(p => { Console.Write(p + " "); });
             Console.WriteLine("");
+            */
         }
 
         /// <summary>
@@ -153,6 +159,7 @@ namespace CircuitSimulator
                         circles[i].Already = true;
                         break;
                     }
+                    //出力
                 case CircuitType.PO:
                     {
                         var index = circles[i].Inputs[0] - 1;
@@ -170,8 +177,7 @@ namespace CircuitSimulator
                     }
                 default:
                     {
-                        Console.WriteLine("Exception");
-                        break;
+                        throw new Exception("Not found Gate process");                        
                     }
             }
         }
@@ -179,15 +185,13 @@ namespace CircuitSimulator
         /// <summary>
         /// 論理シミュレータを実行して、入力パターンから出力を得る。
         /// </summary>
-        /// <param name="circles"></param>
-        /// <returns></returns>
-        public List<CircleData> FindPath(List<CircleData> circles)
-        {
-            
-            //var inputs = CircleInputs.Inputs;
-            var outsideInputs = CircleOutSizeInputs.OutSideInputs;
-            var outsideOutputs = CircleOutsideOutputs.OutsideOutputs;          
-            Initialize(circles, CirclePatternes.Patternes, 0);
+        /// <param name="circles">回路データリスト</param>
+        /// <param name="patternes">入力パターン</param>
+        /// <param name="selectPatternIndex">パターンの選択番号</param>
+        /// <returns>論理回路の出力結果</returns>
+        public List<CircleData> Simulation(List<CircleData> circles, List<List<int>> patternes, int selectPatternIndex)
+        {     
+            Initialize(circles, patternes, selectPatternIndex);
            
             for (int i = 0; i < circles.Count; i++)
             {

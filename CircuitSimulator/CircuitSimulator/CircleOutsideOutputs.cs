@@ -14,7 +14,7 @@ namespace CircuitSimulator
         static CircleOutsideOutputs()
         {
             OutsideOutputs = new List<int>();
-            OutsideOutputs = DataIO.LoadCircleOutsideOutputsFromTxt(FILENAME);
+            OutsideOutputs = DataIO.LoadCircleOutsideOutputsFromTxtAsync(FILENAME).Result;
         }
     }
 }

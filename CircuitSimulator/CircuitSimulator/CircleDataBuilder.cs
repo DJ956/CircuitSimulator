@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace CircuitSimulator
 {
@@ -19,9 +19,9 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public List<CircleData> BuildCircles(string fileName)
+        public async Task<List<CircleData>> BuildCirclesAsync(string fileName)
         {
-            var data = DataIO.LoadCircleFromTxt(fileName);
+            var data = await DataIO.LoadCircleFromTxtAsync(fileName);
             var result = new List<CircleData>(data.Count);
 
             var index = 1;

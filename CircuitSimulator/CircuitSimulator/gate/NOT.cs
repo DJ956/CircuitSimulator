@@ -17,9 +17,6 @@ namespace CircuitSimulator.gate
             return !inputs[0];
         }
 
-        public CircuitType GetCircuitType()
-        {
-            return CircuitType.NOT;
-        }
+        public CircuitType GetCircuitType() { return CircuitType.NOT; }
     }
 }

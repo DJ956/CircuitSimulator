@@ -11,10 +11,7 @@ namespace CircuitSimulator.gate
 
         public CircuitType GetCircuitType() { return CircuitType.AND; }
 
-        public static IGate GetInsctance()
-        {
-            return aND;
-        }
+        public static IGate GetInsctance() { return aND; }
 
         public bool Execute(bool[] inputs)
         {

@@ -29,7 +29,7 @@ namespace CircuitSimulator.gate
             foreach(var g in gates)
             {
                 if(g.GetCircuitType() == circuitType)
-                {
+                {                                       
                     return g.Execute(inputs);
                 }
             }

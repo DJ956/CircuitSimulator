@@ -1,17 +1,80 @@
-﻿using System;
+﻿using CircuitSimulator.gate;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CircuitSimulator
 {
     public class CircleDataBuilder
     {
-        private static int TYPE_INDEX = 0;
-        private static int INPUT_COUNT_INDEX = 1;
-        private static int INPUT_INDEX = 2;
-        private static int OUT_COUNT_INDEX = 3;
-        private static int OUT_INDEX = 4;
+        private static readonly int TYPE_INDEX = 0;
+        private static readonly int INPUT_COUNT_INDEX = 1;
+        private static readonly int INPUT_INDEX = 2;
+        private static readonly int OUT_COUNT_INDEX = 3;
+        private static readonly int OUT_INDEX = 4;
 
         public CircleDataBuilder() { }
+
+        /// <summary>
+        /// 演算順序の優先度を決定する
+        /// </summary>
+        /// <param name="circles"></param>
+        private void DetectPriority(List<CircleData> circles)
+        {
+            var priority = new Queue<int>(Enumerable.Range(0, circles.Count));
+            do
+            {
+                foreach (var c in circles)
+                {
+                    if (c.Already) { continue; }
+
+                    var type = c.CircuitType;
+                    if (type == CircuitType.PI)
+                    {
+                        c.Priority = priority.Dequeue();
+                        c.Already = true;
+                    }
+                    else //PI以外
+                    {
+                        var inputs = c.Inputs;
+                        //入力が1つのみの場合
+                        if (inputs.Length == 1)
+                        {
+                            var index = inputs[0] - 1;
+                            //入力が1ならば優先順位を割り当てる
+                            if (circles[index].Priority != -1)
+                            {
+                                c.Priority = priority.Dequeue();
+                                c.Already = true;
+                            }
+                        }//入力が2つ以上の場合
+                        else if (inputs.Length > 1)
+                        {
+                            var allAlready = true;
+                            //全ての入力線が演算順序決定済みか調べる。
+                            for (int i = 0; i < inputs.Length; i++)
+                            {
+                                var index = inputs[i] - 1;
+                                if (!circles[index].Already)
+                                {
+                                    allAlready = false;
+                                    break;
+                                }
+                            }
+                            if (allAlready)
+                            {
+                                c.Priority = priority.Dequeue();
+                                c.Already = true;
+                            }
+                        }
+                    }
+                }
+            } while (priority.Count != 0);
+
+            //最後に優先順序ごとにソートする
+            circles.Sort((a, b) => a.Priority - b.Priority);
+        }
+
 
         /// <summary>
         /// txtから回路情報を読み取り、Circleリストを作成する
@@ -60,8 +123,12 @@ namespace CircuitSimulator
                 result.Add(circle);
 
                 index++;
+
             }
+            //優先順位決定
+            DetectPriority(result);
             return result;
         }
+
     }
 }

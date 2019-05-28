@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CircuitSimulator.gate;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

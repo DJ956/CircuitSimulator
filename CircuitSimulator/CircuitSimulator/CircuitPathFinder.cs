@@ -9,7 +9,7 @@ namespace CircuitSimulator
         public CircuitPathFinder() { }
 
         /// <summary>
-        /// 入力パターン選択,CircleDataのValue,Alreadyの初期化
+        /// 入力パターン選択,CircleDataのValueの初期化
         /// </summary>
         /// <param name="circles"></param>
         /// <param name="patternes"></param>
@@ -17,11 +17,8 @@ namespace CircuitSimulator
         private void Initialize(List<CircleData> circles, CirclePatternes circlePatternes, int selectPatternIndex)
         {
             //回路データの値の初期化
-            foreach(var c in circles)
-            {
-                c.Already = false;
-                c.Value = false;
-            }
+            foreach (var c in circles) { c.Value = false; }
+
             //外部入力値設定
             for (int i = 0; i < circlePatternes.Patternes[selectPatternIndex].Count; i++)
             {
@@ -32,8 +29,7 @@ namespace CircuitSimulator
                 else
                 {
                     circles[i].Value = true;
-                }
-                circles[i].Already = true;
+                }                           
             }
         }
 
@@ -44,17 +40,14 @@ namespace CircuitSimulator
         /// <param name="i"></param>
         /// <returns></returns>
         private bool[] SelectInputs(List<CircleData> circles, int i)
-        {
+        {           
             var inputsIndexes = circles[i].Inputs;//入力のindexたち
             var inputsValues = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
             for (int j = 0; j < inputsValues.Length; j++)
             {
-                var index = inputsIndexes[j] - 1;
-                if (circles[index].Already)
-                {
-                    inputsValues[j] = circles[index].Value;
-                }
-                else { throw new Exception($"パス:{index + 1}が処理されていないまま{i + 1}の処理を行ううとしています。"); }
+                var index = inputsIndexes[j];                
+                var target = circles.Find(c => c.Index == index);
+                inputsValues[j] = target.Value;                
             }
 
             return inputsValues;
@@ -69,8 +62,7 @@ namespace CircuitSimulator
         {
             var type = circles[i].CircuitType;
             var inputs = SelectInputs(circles, i);
-            circles[i].Value = GateFunctions.Execute(type, inputs);
-            circles[i].Already = true;
+            circles[i].Value = GateFunctions.Execute(type, inputs);            
         }
 
         /// <summary>
@@ -81,14 +73,13 @@ namespace CircuitSimulator
         /// <param name="selectPatternIndex">パターンの選択番号</param>
         /// <returns>論理回路の出力結果</returns>
         public List<CircleData> Simulation(List<CircleData> circles, CirclePatternes circlePatternes, int selectPatternIndex)
-        {     
+        {
             Initialize(circles, circlePatternes, selectPatternIndex);
-           
+
             for (int i = 0; i < circles.Count; i++)
             {
-                FindPath(circles, i);
-            }
-            
+                FindPath(circles, i);                
+            }            
             //出力のみを取得する
             var result = new List<CircleData>();
             foreach (var c in circles)

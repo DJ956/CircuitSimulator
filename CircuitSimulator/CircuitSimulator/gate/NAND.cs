@@ -16,9 +16,6 @@ namespace CircuitSimulator.gate
             return !AND.GetInsctance().Execute(inputs);
         }
 
-        public CircuitType GetCircuitType()
-        {
-            return CircuitType.NAND;
-        }
+        public CircuitType GetCircuitType() { return CircuitType.NAND; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CircuitSimulator.gate;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,7 @@ namespace CircuitSimulator
         public bool Value { get; set; } = false;
         public int[] Inputs { get; private set; }
         public int[] Outs { get; private set; }
+        public int Priority { get; set; } = -1;
 
         public CircleData(int index, CircuitType type, int[] inputs, int[] outs)
         {
@@ -31,7 +33,7 @@ namespace CircuitSimulator
             outputstr = outputstr.TrimEnd();
             var a = Already ? 1 : 0;
             var v = Value ? 1 : 0;
-            return $"INDEX:{Index} TYPE:{CircuitType} INPUTS:({inputstr}) OUTS:({outputstr.ToString()}) Already:{a} Value:{v}";
+            return $"INDEX:{Index} Priority:{Priority} TYPE:{CircuitType} INPUTS:({inputstr}) OUTS:({outputstr.ToString()}) Already:{a} Value:{v}";
         }
     }
 }

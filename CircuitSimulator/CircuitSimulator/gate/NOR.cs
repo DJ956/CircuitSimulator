@@ -16,9 +16,6 @@ namespace CircuitSimulator.gate
             return !OR.GetInstance().Execute(inputs);
         }
 
-        public CircuitType GetCircuitType()
-        {
-            return CircuitType.NOR;
-        }
+        public CircuitType GetCircuitType() { return CircuitType.NOR; }
     }
 }

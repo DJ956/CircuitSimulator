@@ -11,10 +11,7 @@ namespace CircuitSimulator.gate
 
         public static IGate GetInstance() { return oR; }
 
-        public CircuitType GetCircuitType()
-        {
-            return CircuitType.OR;
-        }
+        public CircuitType GetCircuitType() { return CircuitType.OR; }
 
         public bool Execute(bool[] inputs)
         {

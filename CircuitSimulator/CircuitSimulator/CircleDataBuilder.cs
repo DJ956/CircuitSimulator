@@ -22,18 +22,15 @@ namespace CircuitSimulator
         private void DetectPriority(List<CircleData> circles)
         {
             var priority = new Queue<int>(Enumerable.Range(0, circles.Count));
+            
             do
             {
                 foreach (var c in circles)
                 {
-                    if (c.Already) { continue; }
+                    if (c.Already) { continue; }                    
 
                     var type = c.CircuitType;
-                    if (type == CircuitType.PI)
-                    {
-                        c.Priority = priority.Dequeue();
-                        c.Already = true;
-                    }
+                    if (type == CircuitType.PI) { c.Priority = priority.Dequeue(); }
                     else //PI以外
                     {
                         var inputs = c.Inputs;
@@ -42,15 +39,12 @@ namespace CircuitSimulator
                         {
                             var index = inputs[0] - 1;
                             //入力が1ならば優先順位を割り当てる
-                            if (circles[index].Priority != -1)
-                            {
-                                c.Priority = priority.Dequeue();
-                                c.Already = true;
-                            }
+                            if (circles[index].Priority != -1) { c.Priority = priority.Dequeue(); }
+
                         }//入力が2つ以上の場合
-                        else if (inputs.Length > 1)
+                        else
                         {
-                            var allAlready = true;
+                            var allAlready = true;                            
                             //全ての入力線が演算順序決定済みか調べる。
                             for (int i = 0; i < inputs.Length; i++)
                             {
@@ -61,11 +55,8 @@ namespace CircuitSimulator
                                     break;
                                 }
                             }
-                            if (allAlready)
-                            {
-                                c.Priority = priority.Dequeue();
-                                c.Already = true;
-                            }
+                            //全ての入力線が順序決定済みの場合
+                            if (allAlready) { c.Priority = priority.Dequeue(); }                            
                         }
                     }
                 }

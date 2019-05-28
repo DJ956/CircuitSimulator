@@ -18,18 +18,11 @@ namespace CircuitSimulator
         {
             //回路データの値の初期化
             foreach (var c in circles) { c.Value = false; }
-
             //外部入力値設定
             for (int i = 0; i < circlePatternes.Patternes[selectPatternIndex].Count; i++)
             {
-                if (circlePatternes.Patternes[selectPatternIndex][i] == 0)
-                {
-                    circles[i].Value = false;
-                }
-                else
-                {
-                    circles[i].Value = true;
-                }                           
+                var value = circlePatternes.Patternes[selectPatternIndex][i] == 1 ? true : false;
+                circles[i].Value = value;
             }
         }
 

@@ -1,7 +1,4 @@
 ﻿using CircuitSimulator.gate;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CircuitSimulator
 {
@@ -13,7 +10,17 @@ namespace CircuitSimulator
         public bool Value { get; set; } = false;
         public int[] Inputs { get; private set; }
         public int[] Outs { get; private set; }
-        public int Priority { get; set; } = -1;
+
+        private int priority = -1;
+        public int Priority
+        {
+            get { return priority; }
+            set
+            {
+                priority = value;
+                Already = true;
+            }
+        }
 
         public CircleData(int index, CircuitType type, int[] inputs, int[] outs)
         {

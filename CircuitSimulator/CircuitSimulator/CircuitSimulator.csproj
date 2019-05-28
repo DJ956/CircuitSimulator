@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <StartupObject>CircuitSimulator.Program</StartupObject>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
 </Project>

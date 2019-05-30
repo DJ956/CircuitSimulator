@@ -45,6 +45,42 @@ namespace CircuitSimulator
             return result;
         }
 
+        /// <summary>
+        /// 故障ファイルから故障リストを読み込む
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public async static Task<List<CircleFault>> LoadCircleFaultsFromTxtAsync(string fileName)
+        {
+            List<CircleFault> result = null;
+            var path = Path.Combine(ROOT, fileName);
+            try
+            {
+                using (var reader = new StreamReader(path, false))
+                {
+                    var count = int.Parse(await reader.ReadLineAsync());
+                    result = new List<CircleFault>(count);
+                    for (int i = 0; i < count; i++)
+                    {
+                        var line = await reader.ReadLineAsync();
+                        line = line.TrimStart();
+                        var lines = line.Split(SPLIT);
+                        if (lines.Length > 2) { throw new FormatException($"{fileName}のフォーマットが不正です。"); }
+
+                        var faultIndex = int.Parse(lines[0]);
+                        var faultValue = lines[1] == "1" ? true : false;
+                        result.Add(new CircleFault(faultIndex, faultValue));
+                    }
+                }
+            }catch(IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+                Environment.Exit(-1);
+            }
+
+            return result;
+        }
+
 
         /// <summary>
         /// リスト1の回路データを読み込む
@@ -209,6 +245,34 @@ namespace CircuitSimulator
                         await writer.WriteAsync(" ");
                     }
                     await writer.WriteLineAsync("");
+                    await writer.FlushAsync();
+                }
+            }catch(IOException ex)
+            {
+                Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
+                Environment.Exit(-1);
+            }
+        }
+
+        /// <summary>
+        /// 故障診断結果をファイルに書き込む
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        public async static Task SaveFaultResultsAsync(string fileName, List<bool> results)
+        {
+            var path = Path.Combine(ROOT, fileName);
+            try
+            {
+                using (var writer = new StreamWriter(path, false))
+                {
+                    int index = 0;
+                    foreach (var result in results)
+                    {
+                        await writer.WriteLineAsync($"{index}:{result}");
+                        index++;
+                    }
                     await writer.FlushAsync();
                 }
             }catch(IOException ex)

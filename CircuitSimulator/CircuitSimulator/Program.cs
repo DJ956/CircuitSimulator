@@ -42,26 +42,25 @@ namespace CircuitSimulator
             var outputFileName = tableFileName.Replace(".tbl", "_result.txt");            
             var circlePatternes = DataIO.LoadCirclePatternesFromTxtAsync(patternFileName).Result;
             var answers = new List<List<bool>>(circlePatternes.Patternes.Count);
-            for (int i = 0; i < circlePatternes.Patternes.Count; i++)
+
+            foreach (var p in circlePatternes.Patternes)
             {
-                var result = new List<CircleData>( pathFinder.Simulation(circles, circlePatternes, i));
-                var tmp = new List<bool>();
+                var result = pathFinder.Simulation(circles, p, true);
+                var tmp = new List<bool>(result.Count);
                 result.ForEach(r => tmp.Add(r.Value));
                 answers.Add(tmp);
-                
-                DataIO.SaveResultAsync(result, outputFileName).Wait();
             }
-
             Console.WriteLine($"論理シミュレーション時間:{(DateTime.Now - start).TotalSeconds}/s");
 
             //故障シミュレーション実行
             var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;
+            //var faultResults = pathFinder.FaultSimulatorAsync(circles, circlePatternes, answers, faults);
             var faultResults = pathFinder.FaultSimulator(circles, circlePatternes, answers, faults);
 
             var end = DateTime.Now;
             var time = end - start;
 
-
+            DataIO.SaveResultAsync(answers, outputFileName).Wait();
             Console.WriteLine($"シミュレーション結果を{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました。");
 
             outputFileName = tableFileName.Replace(".tbl", ".txt");

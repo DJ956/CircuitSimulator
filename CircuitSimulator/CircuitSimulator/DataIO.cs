@@ -254,6 +254,32 @@ namespace CircuitSimulator
             }
         }
 
+        public async static Task SaveResultAsync(List<List<bool>> answers, string fileName)
+        {
+            var path = Path.Combine(ROOT, fileName);
+            try
+            {
+                using (var writer = new StreamWriter(path, false))
+                {
+                    foreach (var answer in answers)
+                    {
+                        foreach (var a in answer)
+                        {
+                            var v = a ? 1 : 0;
+                            await writer.WriteAsync(v.ToString());
+                            await writer.WriteAsync(" ");
+                        }
+                        await writer.WriteLineAsync("");
+                    }
+                    await writer.FlushAsync();
+                }
+            }catch(IOException ex)
+            {
+                Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
+                Environment.Exit(-1);
+            }
+        }
+
         /// <summary>
         /// 故障診断結果をファイルに書き込む
         /// </summary>

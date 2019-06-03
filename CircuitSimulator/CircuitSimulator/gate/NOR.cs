@@ -17,5 +17,10 @@ namespace CircuitSimulator.gate
         }
 
         public CircuitType GetCircuitType() { return CircuitType.NOR; }
+
+        public bool EquivalentFailure(bool[] normalInputs, bool[] faultInputs)
+        {
+            return Execute(normalInputs) == Execute(faultInputs);
+        }
     }
 }

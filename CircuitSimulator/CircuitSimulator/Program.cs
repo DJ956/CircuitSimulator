@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CircuitSimulator
 {
@@ -53,9 +54,11 @@ namespace CircuitSimulator
             Console.WriteLine($"論理シミュレーション時間:{(DateTime.Now - start).TotalSeconds}/s");
 
             //故障シミュレーション実行
-            var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;
-            //var faultResults = pathFinder.FaultSimulatorAsync(circles, circlePatternes, answers, faults);
-            var faultResults = pathFinder.FaultSimulator(circles, circlePatternes, answers, faults);
+            var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;            
+            var faultResults = pathFinder.FaultSimulatorOld(circles, circlePatternes, answers, faults);
+            //var faultResults = pathFinder.FaultSimulator(circles, circlePatternes, answers, faults);
+
+            Console.WriteLine($"Count:{faultResults.Count(f => f == true)}");
 
             var end = DateTime.Now;
             var time = end - start;

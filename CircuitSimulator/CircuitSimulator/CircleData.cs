@@ -1,8 +1,9 @@
-﻿using CircuitSimulator.gate;
+﻿using System;
+using CircuitSimulator.gate;
 
 namespace CircuitSimulator
 {
-    public class CircleData
+    public class CircleData : ICloneable
     {
         public int Index { get; private set; }
         public CircuitType CircuitType { get; private set; }
@@ -30,6 +31,15 @@ namespace CircuitSimulator
             Outs = outs;
         }
 
+        public CircleData(int index, CircuitType type, int[] inputs, int[] outs, int priotiry)
+        {
+            Index = index;
+            CircuitType = type;
+            Inputs = inputs;
+            Outs = outs;
+            Priority = priotiry;
+        }
+
         public override string ToString()
         {
             var inputstr = "";
@@ -41,6 +51,11 @@ namespace CircuitSimulator
             var a = Already ? 1 : 0;
             var v = Value ? 1 : 0;
             return $"INDEX:{Index} Priority:{Priority} TYPE:{CircuitType} INPUTS:({inputstr}) OUTS:({outputstr.ToString()}) Already:{a} Value:{v}";
+        }
+
+        public object Clone()
+        {
+            return new CircleData(this.Index, this.CircuitType, this.Inputs, this.Outs, this.Priority);          
         }
     }
 }

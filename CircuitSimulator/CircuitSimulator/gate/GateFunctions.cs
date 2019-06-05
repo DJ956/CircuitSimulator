@@ -33,10 +33,10 @@ namespace CircuitSimulator.gate
         /// <param name="inputs">入力値</param>
         /// <param name="index">故障が発生するインデックス</param>
         /// <returns></returns>
-        public static bool Execute(CircuitType circuitType, bool[] inputs, int index)
+        public static bool Execute(CircuitType circuitType, bool[] inputs, CircleData circle)
         {
             //故障個所のインデックスになれば故障値を返す。
-            if(CircleFault != null && CircleFault.FaultIndex == index) { return CircleFault.FaultValue; }
+            if(CircleFault != null && CircleFault.FaultIndex == circle.Index) { return CircleFault.FaultValue; }
 
             foreach(var g in gates)
             {

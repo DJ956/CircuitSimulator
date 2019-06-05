@@ -79,7 +79,7 @@ namespace CircuitSimulator
             {
                 var faultIndex = tasks.Dequeue();
                 faultCircle = circles.Find(c => c.Index == faultIndex);
-
+                //正常値の値をキャッシュから復元
                 for (int i = 0; i < cash.Count; i++) { circles[i].Value = cash[i]; }
                 var normalInputs = SelectInputs(circles, faultIndex);
                 //故障発生を起こす
@@ -89,13 +89,16 @@ namespace CircuitSimulator
                 //故障キャッシュにデータ記録する
                 faultCash[circles.FindIndex(c => c.Index == faultIndex)] = GateFunctions.Execute(faultCircle.CircuitType, faultInputs);
 
-                //等価故障ではなかった場合
+                //等価故障ではなかった場合                
                 if (!GateFunctions.EquivalentFailure(faultCircle.CircuitType, normalInputs, faultInputs))
                 {
-                    //故障出力追加
-                    foreach (var fo in faultCircle.Outs) { tasks.Enqueue(fo); }
                     equivalent = false;
+                    //見ているところが、最終外部出力でなければ故障出力追加                    
+                    if (faultCircle.CircuitType == CircuitType.PO) { continue; }
+                    foreach (var fo in faultCircle.Outs) { tasks.Enqueue(fo); }
                 }
+                else { equivalent = true; }
+
             } while (tasks.Any());
             //故障した場所からの出力を見る
 
@@ -174,7 +177,7 @@ namespace CircuitSimulator
         /// 故障シミュレーションを実行する
         /// </summary>
         /// <param name="circles">回路データ</param>
-        /// <param name="circlePatternes">入力パターン</param>
+        /// <param name="circlePatternes">入力パターン</param>        
         /// <param name="answers">正常な状態での全入力パターンに対する値</param>
         /// <param name="faults">故障個所リスト</param>
         /// <returns></returns>
@@ -193,8 +196,8 @@ namespace CircuitSimulator
                 foreach (var p in circlePatternes.Patternes)
                 {
                     //故障した個所からのすべての出力が等価故障だったので検知不可能
-                    if(EquivalentFailure(circles, i, f)) { break; }
-                    
+                    if (EquivalentFailure(circles, i, f)) { break; }
+
                     //正常値
                     var answer = answers[i];
 
@@ -227,7 +230,7 @@ namespace CircuitSimulator
             return result;
         }
 
-        public List<bool> FaultSimulatorAsync(List<CircleData> circles, CirclePatternes circlePatternes, List<List<bool>> answers,
+        public List<bool> FaultSimulatorAsyncOld(List<CircleData> circles, CirclePatternes circlePatternes, List<List<bool>> answers,
             List<CircleFault> faults)
         {
             var result = new List<bool>(faults.Count);

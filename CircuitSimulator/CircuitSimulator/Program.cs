@@ -35,7 +35,7 @@ namespace CircuitSimulator
             var pathFinder = new CircuitPathFinder();
 
             var circleRawData = DataIO.LoadTableAsync(tableFileName).Result;
-            var circleInputs = circleRawData.CircleInputs;
+            var circleInputs = circleRawData.CircleInputs;            
             var circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
 
             //シミュレーション実行&結果出力

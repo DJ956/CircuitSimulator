@@ -19,16 +19,17 @@ namespace CircuitSimulator
 
             //ファイルパス入力
             Console.WriteLine("テーブルファイル名を入力してください(*.tbl)...");
-            var tableFileName = Console.ReadLine();                        
+            var tableFileName = Console.ReadLine();           
             Console.WriteLine("パターンファイル名を入力してください(*.pat)...");
-            var patternFileName = Console.ReadLine();
+            var patternFileName = Console.ReadLine();            
             Console.WriteLine("故障リストファイル名を入力してください(*.rep)...");
             var faultFileName = Console.ReadLine();
 
-            //以前に作成した結果ファイルを削除
-            var oldFile = Path.Combine(DataIO.ROOT, tableFileName.Replace(".tbl", "_result.txt"));
-            if(File.Exists(oldFile)) { File.Delete(oldFile); }
+            Execute(tableFileName, patternFileName, faultFileName);
+        }
 
+        private static void Execute(string tableFileName, string patternFileName, string faultFileName)
+        {            
             var start = DateTime.Now;
 
             //データ入力
@@ -36,11 +37,11 @@ namespace CircuitSimulator
             var pathFinder = new CircuitPathFinder();
 
             var circleRawData = DataIO.LoadTableAsync(tableFileName).Result;
-            var circleInputs = circleRawData.CircleInputs;            
+            var circleInputs = circleRawData.CircleInputs;
             var circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
 
             //シミュレーション実行&結果出力
-            var outputFileName = tableFileName.Replace(".tbl", "_result.txt");            
+            var outputFileName = tableFileName.Replace(".tbl", "_result.txt");
             var circlePatternes = DataIO.LoadCirclePatternesFromTxtAsync(patternFileName).Result;
             var answers = new List<List<bool>>(circlePatternes.Patternes.Count);
 
@@ -54,10 +55,9 @@ namespace CircuitSimulator
             Console.WriteLine($"論理シミュレーション時間:{(DateTime.Now - start).TotalSeconds}/s");
 
             //故障シミュレーション実行
-            var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;            
-            var faultResults = pathFinder.FaultSimulatorOld(circles, circlePatternes, answers, faults);
-            //var faultResults = pathFinder.FaultSimulator(circles, circlePatternes, answers, faults);
-
+            var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;
+            var faultResults = pathFinder.FaultSimulatorAsync(circles, circlePatternes, answers, faults);
+            
             Console.WriteLine($"Count:{faultResults.Count(f => f == true)}");
 
             var end = DateTime.Now;

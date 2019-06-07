@@ -8,8 +8,6 @@ namespace CircuitSimulator.gate
     {
         private static List<IGate> gates;
 
-        public static CircleFault CircleFault { get; set; }
-
         static GateFunctions()
         {
             gates = new List<IGate>();
@@ -33,10 +31,10 @@ namespace CircuitSimulator.gate
         /// <param name="inputs">入力値</param>
         /// <param name="index">故障が発生するインデックス</param>
         /// <returns></returns>
-        public static bool Execute(CircuitType circuitType, bool[] inputs, CircleData circle)
+        public static bool Execute(CircuitType circuitType, bool[] inputs, CircleData circle, CircleFault fault)
         {
             //故障個所のインデックスになれば故障値を返す。
-            if(CircleFault != null && CircleFault.FaultIndex == circle.Index) { return CircleFault.FaultValue; }
+            if(fault.FaultIndex == circle.Index) { return fault.FaultValue; }
 
             foreach(var g in gates)
             {

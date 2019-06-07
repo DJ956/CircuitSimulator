@@ -228,32 +228,9 @@ namespace CircuitSimulator
         /// <summary>
         /// 論理シミュレータの出力結果を保存する
         /// </summary>
-        /// <param name="results"></param>
+        /// <param name="answers"></param>
         /// <param name="fileName"></param>
-        public async static Task SaveResultAsync(List<CircleData> result, string fileName)
-        {
-            var path = Path.Combine(ROOT, fileName);
-            
-            try
-            {
-                using (var writer = new StreamWriter(path, true))
-                {
-                    foreach (var c in result)
-                    {
-                        var v = c.Value ? 1 : 0;                        
-                        await writer.WriteAsync(v.ToString());
-                        await writer.WriteAsync(" ");
-                    }
-                    await writer.WriteLineAsync("");
-                    await writer.FlushAsync();
-                }
-            }catch(IOException ex)
-            {
-                Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
-                Environment.Exit(-1);
-            }
-        }
-
+        /// <returns></returns>
         public async static Task SaveResultAsync(List<List<bool>> answers, string fileName)
         {
             var path = Path.Combine(ROOT, fileName);

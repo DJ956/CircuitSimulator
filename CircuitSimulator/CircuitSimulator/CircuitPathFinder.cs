@@ -9,7 +9,27 @@ namespace CircuitSimulator
 {
     public class CircuitPathFinder
     {
-        public CircuitPathFinder() { }
+        /// <summary>
+        /// 答えソートリストを作成する
+        /// </summary>
+        /// <param name="circles"></param>
+        public CircuitPathFinder(List<CircleData> circles)
+        {
+            Circles = circles;
+            sortedIndex = new SortedDictionary<int, int>();            
+            for (int i = 0; i < circles.Count; i++)
+            {
+                var c = Circles[i];
+                if (c.CircuitType == CircuitType.PO)
+                {
+                    sortedIndex.Add(c.Inputs[0], i);
+                }
+            }
+        }
+
+        public List<CircleData> Circles { get; private set; }
+
+        private SortedDictionary<int, int> sortedIndex;
 
         /// <summary>
         /// 回路データの値のキャッシュ
@@ -22,19 +42,18 @@ namespace CircuitSimulator
         /// <param name="circles"></param>
         /// <param name="patternes"></param>
         /// <param name="selectPatternIndex"></param>
-        private void Initialize(List<CircleData> circles, List<int> pattern)
+        private void Initialize(List<int> pattern)
         {
             if (circleValuesCash == null) { circleValuesCash = new List<List<bool>>(); }
 
             //回路データの値の初期化
-            Parallel.ForEach(circles, c => c.Value = false);
-            //foreach (var c in circles) { c.Value = false; }
+            Parallel.ForEach(Circles, c => c.Value = false);
 
             //外部入力値設定            
             for (int i = 0; i < pattern.Count; i++)
             {
-                var p = pattern[i];                
-                circles[i].Value = p == 1 ? true : false;                
+                var p = pattern[i];
+                Circles[i].Value = p == 1 ? true : false;
             }
         }
 
@@ -44,7 +63,7 @@ namespace CircuitSimulator
         /// すべての故障個所からの出力が、等価故障だった場合、最後まで見る必要はない
         /// </summary>
         /// <returns>故障が検知可能()ならTrue,不可能(全て等価故障)ならFalse</returns>        
-        private bool EquivalentFailure(List<CircleData> circles, int patternIndex, CircleFault fault)
+        private bool EquivalentFailure(int patternIndex, CircleFault fault)
         {
             var equivalent = true;
 
@@ -52,30 +71,30 @@ namespace CircuitSimulator
             var cash = circleValuesCash[patternIndex];
             //故障キャッシュ
             var faultCash = new List<bool>(cash.Count);
-            for (int i = 0; i < circles.Count; i++)
+            for (int i = 0; i < Circles.Count; i++)
             {
-                circles[i].Value = cash[i];
+                Circles[i].Value = cash[i];
                 faultCash[i] = cash[i];
             }
 
-            var faultCircle = circles.Find(c => c.Index == fault.FaultIndex);
+            var faultCircle = Circles.Find(c => c.Index == fault.FaultIndex);
             var outputs = faultCircle.Outs;
             var tasks = new Queue<int>(outputs);
 
             do
             {
                 var faultIndex = tasks.Dequeue();
-                faultCircle = circles.Find(c => c.Index == faultIndex);
+                faultCircle = Circles.Find(c => c.Index == faultIndex);
                 //正常値の値をキャッシュから復元
-                for (int i = 0; i < cash.Count; i++) { circles[i].Value = cash[i]; }
-                var normalInputs = SelectInputs(circles, faultIndex);
+                for (int i = 0; i < cash.Count; i++) { Circles[i].Value = cash[i]; }
+                var normalInputs = SelectInputs(faultIndex);
 
                 //故障発生を起こす
-                for (int i = 0; i < faultCash.Count; i++) { circles[i].Value = faultCash[i]; }//Index違い
-                circles.Find(c => c.Index == faultIndex).Value = fault.FaultValue;
-                var faultInputs = SelectInputs(circles, faultIndex);
+                for (int i = 0; i < faultCash.Count; i++) { Circles[i].Value = faultCash[i]; }//Index違い
+                Circles.Find(c => c.Index == faultIndex).Value = fault.FaultValue;
+                var faultInputs = SelectInputs(faultIndex);
                 //故障キャッシュにデータ記録する
-                faultCash[circles.FindIndex(c => c.Index == faultIndex)] = GateFunctions.Execute(faultCircle.CircuitType, faultInputs);
+                faultCash[Circles.FindIndex(c => c.Index == faultIndex)] = GateFunctions.Execute(faultCircle.CircuitType, faultInputs);
 
                 //等価故障ではなかった場合                
                 if (!GateFunctions.EquivalentFailure(faultCircle.CircuitType, normalInputs, faultInputs))
@@ -91,26 +110,26 @@ namespace CircuitSimulator
             //故障した場所からの出力を見る
 
             //回路データに入力されたキャッシュデータもとに戻しておく
-            foreach (var c in circles) { c.Value = false; }
+            foreach (var c in Circles) { c.Value = false; }
 
             return equivalent;
         }
         */
+        
 
         /// <summary>
         /// CircleDataの入力Indexが格納されている配列からそれらの値を摘出します。
-        /// </summary>
-        /// <param name="circles">回路データ</param>
+        /// </summary>        
         /// <param name="i">処理中の配列インデックス</param>
         /// <returns></returns>
-        private bool[] SelectInputs(List<CircleData> circles, int i)
+        private bool[] SelectInputs(int i)
         {
-            var inputsIndexes = circles[i].Inputs;//入力のindexたち
+            var inputsIndexes = Circles[i].Inputs;//入力のindexたち
             var inputsValues = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
             for (int j = 0; j < inputsValues.Length; j++)
             {
                 var index = inputsIndexes[j];
-                var target = circles.Find(c => c.Index == index);
+                var target = Circles.Find(c => c.Index == index);
                 inputsValues[j] = target.Value;
             }
 
@@ -119,19 +138,18 @@ namespace CircuitSimulator
 
         /// <summary>
         /// 回路データを元に故障キャッシュから入力値を取得する(スレッドセーフ)
-        /// </summary>
-        /// <param name="circles">回路データ　読み取り専用</param>
+        /// </summary>        
         /// <param name="cash">故障キャッシュ</param>
         /// <param name="i">処理中の配列インデックス</param>
         /// <returns></returns>
-        private bool[] GetInputsSafe(List<CircleData> circles, bool[] cash, int i)
+        private bool[] GetInputsSafe(bool[] cash, int i)
         {
-            var inputsIndexes = circles[i].Inputs;
+            var inputsIndexes = Circles[i].Inputs;
             var result = new bool[inputsIndexes.Length];
             for (int j = 0; j < inputsIndexes.Length; j++)
             {
                 var index = inputsIndexes[j];
-                var targetIndex = circles.FindIndex(c => c.Index == index);
+                var targetIndex = Circles.FindIndex(c => c.Index == index);
                 result[j] = cash[targetIndex];
             }
 
@@ -143,25 +161,24 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="circles">回路データ</param>
         /// <param name="i">処理中の配列インデックス</param>
-        private void FindPath(List<CircleData> circles, int i)
+        private void FindPath(int i)
         {
-            var type = circles[i].CircuitType;
-            var inputs = SelectInputs(circles, i);
-            circles[i].Value = GateFunctions.Execute(type, inputs);
+            var type = Circles[i].CircuitType;
+            var inputs = SelectInputs(i);
+            Circles[i].Value = GateFunctions.Execute(type, inputs);
         }
 
         /// <summary>
         /// ゲート演算結果を故障キャッシュに設定する(スレッドセーフ)
-        /// </summary>
-        /// <param name="circles">回路データ　読み込み処理のみ</param>
+        /// </summary>        
         /// <param name="faultCash">故障キャッシュ</param>
         /// <param name="i">処理中の配列インデックス</param>
         /// <param name="fault">故障個所</param>
-        private void DetectValueSafe(List<CircleData> circles, bool[] faultCash, int i, CircleFault fault)
+        private void DetectValueSafe(bool[] faultCash, int i, CircleFault fault)
         {
-            var type = circles[i].CircuitType;
-            var inputs = GetInputsSafe(circles, faultCash, i);
-            faultCash[i] = GateFunctions.Execute(type, inputs, circles[i], fault);
+            var type = Circles[i].CircuitType;
+            var inputs = GetInputsSafe(faultCash, i);
+            faultCash[i] = GateFunctions.Execute(type, inputs, Circles[i], fault);
         }
 
         /// <summary>
@@ -171,65 +188,52 @@ namespace CircuitSimulator
         /// <param name="pattern">入力パターン</param>
         /// <param name="saveCash">キャッシュデータを保存するか否か</param>
         /// <returns>論理回路の出力結果</returns>
-        public List<CircleData> Simulation(List<CircleData> circles, List<int> pattern, bool saveCash)
+        public List<bool> Simulation(List<int> pattern, bool saveCash)
         {
-            Initialize(circles, pattern);
+            Initialize(pattern);
 
-            for (int i = 0; i < circles.Count; i++)
+            for (int i = 0; i < Circles.Count; i++)
             {
-                FindPath(circles, i);
+                FindPath(i);
             }
 
-            var cash = new List<bool>(circles.Count);
+            var cash = new List<bool>(Circles.Count);
             //出力のみを取得とキャッシュデータ保存
-            var result = new List<CircleData>();
-            foreach (var c in circles)
+            var result = new List<bool>(sortedIndex.Count);
+            foreach (KeyValuePair<int, int> item in sortedIndex)
             {
-                if (c.CircuitType == CircuitType.PO) { result.Add(c); }
-                cash.Add(c.Value);
+                var index = item.Value;
+                result.Add(Circles[index].Value);
+                cash.Add(Circles[index].Value);
             }
             //キャッシュのリストの追加
             if (saveCash) { circleValuesCash.Add(cash); }
-
-            result.Sort((a, b) => a.Inputs[0] - b.Inputs[0]);
+            
             return result;
         }
 
         /// <summary>
         /// スレッドセーフな故障シミュレーション
-        /// </summary>
-        /// <param name="circles"></param>
+        /// </summary>        
         /// <param name="pattern"></param>
-        /// <param name="startIndex"></param>
+        /// <param name="fault"></param>
         /// <returns></returns>
-        private List<bool> SimulationSafe(List<CircleData> circles, List<int> pattern, CircleFault fault)
+        private List<bool> SimulationSafe(List<int> pattern, CircleFault fault)
         {
-            var faultCash = new bool[circles.Count];
+            var faultCash = new bool[Circles.Count];
             //入力パターン設定
             for (int i = 0; i < pattern.Count; i++)
             {
                 faultCash[i] = pattern[i] == 1 ? true : false;
             }
 
-            for (int i = 0; i < circles.Count; i++)
+            for (int i = 0; i < Circles.Count; i++)
             {
-                DetectValueSafe(circles, faultCash, i, fault);
+                DetectValueSafe(faultCash, i, fault);
             }
-
-            //key => InputIndex Value=>配列のインデックス
-            var dic = new SortedDictionary<int, int>();
-
-            for (int i = 0; i < circles.Count; i++)
-            {
-                var c = circles[i];
-                if (c.CircuitType == CircuitType.PO)
-                {
-                    dic.Add(c.Inputs[0], i);
-                }
-            }
-
-            var result = new List<bool>(dic.Count);
-            foreach (KeyValuePair<int, int> item in dic)
+                        
+            var result = new List<bool>(sortedIndex.Count);
+            foreach (KeyValuePair<int, int> item in sortedIndex)
             {
                 result.Add(faultCash[item.Value]);
             }
@@ -284,13 +288,12 @@ namespace CircuitSimulator
         /// <param name="answers">正常時の答えリスト</param>
         /// <param name="faults">故障リスト</param>
         /// <returns></returns>
-        public List<bool> FaultSimulatorAsync(List<CircleData> circles, CirclePatternes circlePatternes, List<List<bool>> answers,
+        public List<bool> FaultSimulatorAsync(CirclePatternes circlePatternes, List<List<bool>> answers,
             List<CircleFault> faults)
         {
             var result = new BlockingCollection<bool>();
             //すべての故障個所が発見できたか走査する。
-            Parallel.ForEach(faults, f =>
-            //foreach (var f in faults)
+            Parallel.ForEach(faults, f =>            
             {
                 var isDetect = false;
                 //全入力パターンを回して検出できるか試す。検出できたならそこで終了
@@ -301,7 +304,7 @@ namespace CircuitSimulator
                     var p = circlePatternes.Patternes[i];                    
 
                     //故障設定した状態でシミュレーション実行
-                    var simResult = SimulationSafe(circles, p, f);
+                    var simResult = SimulationSafe(p, f);
 
                     //答え合わせ
                     for (int j = 0; j < answer.Count; j++)

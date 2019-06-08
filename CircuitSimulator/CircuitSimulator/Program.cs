@@ -25,6 +25,7 @@ namespace CircuitSimulator
             Console.WriteLine("故障リストファイル名を入力してください(*.rep)...");
             var faultFileName = Console.ReadLine();
 
+            Console.WriteLine("");
             Execute(tableFileName, patternFileName, faultFileName);
         }
 
@@ -33,12 +34,14 @@ namespace CircuitSimulator
             var start = DateTime.Now;
 
             //データ入力
-            var builder = new CircleDataBuilder();
-            var pathFinder = new CircuitPathFinder();
+            var builder = new CircleDataBuilder();            
 
             var circleRawData = DataIO.LoadTableAsync(tableFileName).Result;
             var circleInputs = circleRawData.CircleInputs;
             var circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
+            var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;
+
+            var pathFinder = new CircuitPathFinder(circles);
 
             //シミュレーション実行&結果出力
             var outputFileName = tableFileName.Replace(".tbl", "_result.txt");
@@ -47,21 +50,22 @@ namespace CircuitSimulator
 
             foreach (var p in circlePatternes.Patternes)
             {
-                var result = pathFinder.Simulation(circles, p, true);
-                var tmp = new List<bool>(result.Count);
-                result.ForEach(r => tmp.Add(r.Value));
+                var result = pathFinder.Simulation(p, true);
+                var tmp = new List<bool>(result);                
                 answers.Add(tmp);
             }
             Console.WriteLine($"論理シミュレーション時間:{(DateTime.Now - start).TotalSeconds}/s");
 
-            //故障シミュレーション実行
-            var faults = DataIO.LoadCircleFaultsFromTxtAsync(faultFileName).Result;
-            var faultResults = pathFinder.FaultSimulatorAsync(circles, circlePatternes, answers, faults);
-            
-            Console.WriteLine($"Count:{faultResults.Count(f => f == true)}");
+            //故障シミュレーション実行            
+            var faultResults = pathFinder.FaultSimulatorAsync(circlePatternes, answers, faults);
 
             var end = DateTime.Now;
             var time = end - start;
+
+            Console.WriteLine($"故障数:{faults.Count}");
+            var detectCount = faultResults.AsParallel().Count(f => f == true);
+            Console.WriteLine($"故障検出数:{detectCount}");            
+            Console.WriteLine($"故障検出率:{(double)detectCount / faults.Count * 100}");
 
             DataIO.SaveResultAsync(answers, outputFileName).Wait();
             Console.WriteLine($"シミュレーション結果を{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました。");

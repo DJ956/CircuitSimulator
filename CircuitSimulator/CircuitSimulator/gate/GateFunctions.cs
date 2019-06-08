@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CircuitSimulator.gate
 {
@@ -10,7 +9,7 @@ namespace CircuitSimulator.gate
 
         static GateFunctions()
         {
-            gates = new List<IGate>();
+            gates = new List<IGate>(10);
 
             gates.Add(AND.GetInsctance());
             gates.Add(Branch.GetInstance());
@@ -36,15 +35,8 @@ namespace CircuitSimulator.gate
             //故障個所のインデックスになれば故障値を返す。
             if(fault.FaultIndex == circle.Index) { return fault.FaultValue; }
 
-            foreach(var g in gates)
-            {
-                if(g.GetCircuitType() == circuitType)
-                {                                       
-                    return g.Execute(inputs);
-                }
-            }
-
-            throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
+            return gates.Find(g => g.GetCircuitType() == circuitType).Execute(inputs);            
+            //throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
         }
 
         /// <summary>
@@ -55,14 +47,8 @@ namespace CircuitSimulator.gate
         /// <returns></returns>
         public static bool Execute(CircuitType circuitType, bool[] inputs)
         {
-            foreach(var g in gates)
-            {
-                if(g.GetCircuitType() == circuitType)
-                {
-                    return g.Execute(inputs);
-                }
-            }
-            throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
+            return gates.Find(g => g.GetCircuitType() == circuitType).Execute(inputs);
+            //throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
         }
 
         /// <summary>
@@ -74,15 +60,8 @@ namespace CircuitSimulator.gate
         /// <returns></returns>
         public static bool EquivalentFailure(CircuitType circuitType, bool[] normalInputs, bool[] faultInputs)
         {
-            foreach(var g in gates)
-            {
-                if(g .GetCircuitType() == circuitType)
-                {
-                    return g.EquivalentFailure(normalInputs, faultInputs);
-                }
-            }
-
-            throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
+            return gates.Find(g => g.GetCircuitType() == circuitType).EquivalentFailure(normalInputs, faultInputs);
+            //throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
         }
     }
 }

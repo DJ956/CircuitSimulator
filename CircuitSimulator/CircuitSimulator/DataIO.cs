@@ -240,6 +240,7 @@ namespace CircuitSimulator
                 {
                     foreach (var answer in answers)
                     {
+                        await writer.WriteAsync(" ");
                         foreach (var a in answer)
                         {
                             var v = a ? 1 : 0;

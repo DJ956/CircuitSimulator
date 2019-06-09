@@ -18,14 +18,13 @@ namespace CircuitSimulator
             Console.WriteLine("----------------------------------------");
 
             //ファイルパス入力
-            Console.WriteLine("テーブルファイル名を入力してください(*.tbl)...");
-            var tableFileName = Console.ReadLine();           
-            Console.WriteLine("パターンファイル名を入力してください(*.pat)...");
-            var patternFileName = Console.ReadLine();            
-            Console.WriteLine("故障リストファイル名を入力してください(*.rep)...");
-            var faultFileName = Console.ReadLine();
+            Console.WriteLine("ファイル名を入力してください...");
+            var fileName = Console.ReadLine();
+            var tableFileName = fileName + ".tbl";
+            var patternFileName = fileName + ".pat";
+            var faultFileName = fileName + "f.rep";
 
-            Console.WriteLine("");
+            Console.WriteLine("----------------------------------------");
             Execute(tableFileName, patternFileName, faultFileName);
         }
 

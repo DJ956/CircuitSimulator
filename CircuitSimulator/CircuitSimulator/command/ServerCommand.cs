@@ -36,10 +36,7 @@ namespace CircuitSimulator.command
             try
             {
                 var manager = new WorkerManager(port, workerCount, answers, circles, circlePatternes, faults);
-                var start = DateTime.Now;
                 detectCount = manager.StartAsync().Result;
-                var end = DateTime.Now;
-                Console.WriteLine($"処理時間:{(end - start).TotalSeconds}/s");
             }
             catch (Exception ex)
             {

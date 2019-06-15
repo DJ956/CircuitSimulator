@@ -103,8 +103,11 @@ namespace CircuitSimulator.worker
             } while (workers.Count != workerCount);
 
             Console.WriteLine("ワーク開始");
+            var start = DateTime.Now;
             var result = ExecuteWork(workers);
+            var end = DateTime.Now;
 
+            Console.WriteLine($"処理時間:{(end - start).TotalSeconds} /s");
             return result;
         }
 

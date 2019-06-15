@@ -3,14 +3,15 @@ using CircuitSimulator.gate;
 
 namespace CircuitSimulator
 {
-    public class CircleData : ICloneable
+    [Serializable]
+    public class CircleData
     {
-        public int Index { get; private set; }
-        public CircuitType CircuitType { get; private set; }
+        public int Index { get; set; }
+        public CircuitType CircuitType { get; set; }
         public bool Already { get; set; } = false;
         public bool Value { get; set; } = false;
-        public int[] Inputs { get; private set; }
-        public int[] Outs { get; private set; }
+        public int[] Inputs { get; set; }
+        public int[] Outs { get; set; }
 
         private int priority = -1;
         public int Priority
@@ -22,6 +23,8 @@ namespace CircuitSimulator
                 Already = true;
             }
         }
+
+        public CircleData() { }
 
         public CircleData(int index, CircuitType type, int[] inputs, int[] outs)
         {
@@ -51,11 +54,6 @@ namespace CircuitSimulator
             var a = Already ? 1 : 0;
             var v = Value ? 1 : 0;
             return $"INDEX:{Index} Priority:{Priority} TYPE:{CircuitType} INPUTS:({inputstr}) OUTS:({outputstr.ToString()}) Already:{a} Value:{v}";
-        }
-
-        public object Clone()
-        {
-            return new CircleData(this.Index, this.CircuitType, this.Inputs, this.Outs, this.Priority);          
         }
     }
 }

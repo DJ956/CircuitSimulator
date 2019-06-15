@@ -8,19 +8,17 @@ namespace CircuitSimulator.gate
         private static List<IGate> gates;
 
         static GateFunctions()
-        {
-            gates = new List<IGate>(10);
-
+        {            
+            gates = new List<IGate>(9);
             gates.Add(AND.GetInsctance());
             gates.Add(Branch.GetInstance());
-            gates.Add(EXOR.GetInstance());
-            gates.Add(FF.GetInstance());
+            gates.Add(EXOR.GetInstance());            
             gates.Add(NAND.GetInstance());
             gates.Add(NOR.GetInstance());
             gates.Add(NOT.GetInstance());
             gates.Add(OR.GetInstance());
             gates.Add(PI.GetInstance());
-            gates.Add(PO.GetInstance());
+            gates.Add(PO.GetInstance());           
         }
 
         /// <summary>
@@ -35,7 +33,7 @@ namespace CircuitSimulator.gate
             //故障個所のインデックスになれば故障値を返す。
             if(fault.FaultIndex == circle.Index) { return fault.FaultValue; }
 
-            return gates.Find(g => g.GetCircuitType() == circuitType).Execute(inputs);            
+            return gates.Find(g => g.GetCircuitType() == circuitType).Execute(inputs);                        
             //throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
         }
 
@@ -48,6 +46,7 @@ namespace CircuitSimulator.gate
         public static bool Execute(CircuitType circuitType, bool[] inputs)
         {
             return gates.Find(g => g.GetCircuitType() == circuitType).Execute(inputs);
+            
             //throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
         }
 
@@ -61,6 +60,7 @@ namespace CircuitSimulator.gate
         public static bool EquivalentFailure(CircuitType circuitType, bool[] normalInputs, bool[] faultInputs)
         {
             return gates.Find(g => g.GetCircuitType() == circuitType).EquivalentFailure(normalInputs, faultInputs);
+            
             //throw new Exception($"ゲート:{circuitType}に対する処理が実装されていません");
         }
     }

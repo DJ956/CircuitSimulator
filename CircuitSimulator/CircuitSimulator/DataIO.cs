@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace CircuitSimulator
 {
@@ -72,7 +74,8 @@ namespace CircuitSimulator
                         result.Add(new CircleFault(faultIndex, faultValue));
                     }
                 }
-            }catch(IOException ex)
+            }
+            catch (IOException ex)
             {
                 Console.WriteLine(ex.Message);
                 Environment.Exit(-1);
@@ -128,7 +131,7 @@ namespace CircuitSimulator
 
             var count = int.Parse(await reader.ReadLineAsync());
             result = new List<int>(count);
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 var line = await reader.ReadLineAsync();
                 line = line.TrimStart();
@@ -210,15 +213,16 @@ namespace CircuitSimulator
             var path = Path.Combine(ROOT, fileName);
             try
             {
-                using(var writer = new StreamWriter(path, false))
+                using (var writer = new StreamWriter(path, false))
                 {
-                    foreach(var c in circles)
+                    foreach (var c in circles)
                     {
                         await writer.WriteLineAsync(c.ToString());
                     }
                     await writer.FlushAsync();
                 }
-            }catch(IOException ex)
+            }
+            catch (IOException ex)
             {
                 Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
                 Environment.Exit(-1);
@@ -251,7 +255,8 @@ namespace CircuitSimulator
                     }
                     await writer.FlushAsync();
                 }
-            }catch(IOException ex)
+            }
+            catch (IOException ex)
             {
                 Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
                 Environment.Exit(-1);
@@ -279,10 +284,41 @@ namespace CircuitSimulator
                     }
                     await writer.FlushAsync();
                 }
-            }catch(IOException ex)
+            }
+            catch (IOException ex)
             {
                 Console.WriteLine("ファイルの書き込みに失敗しました\n" + ex.Message);
                 Environment.Exit(-1);
+            }
+        }
+
+        /// <summary>
+        /// Objectをバイナリーにシリアライズする
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static byte[] Serialize(object obj)
+        {
+            var binary = new BinaryFormatter();
+            using (var memory = new MemoryStream())
+            {
+                binary.Serialize(memory, obj);
+                memory.Seek(0, SeekOrigin.Begin);
+                return memory.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// バイナリー化されたシリアライズデータをObjectに直す
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static object Deserialize(byte[] data)
+        {
+            var binary = new BinaryFormatter();
+            using (var memory = new MemoryStream(data))
+            {
+                return binary.Deserialize(memory);
             }
         }
     }

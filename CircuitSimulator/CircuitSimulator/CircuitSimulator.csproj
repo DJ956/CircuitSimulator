@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <StartupObject>CircuitSimulator.Program</StartupObject>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <Authors>DJ956</Authors>
     <Company>E&amp;K</Company>
     <SignAssembly>false</SignAssembly>

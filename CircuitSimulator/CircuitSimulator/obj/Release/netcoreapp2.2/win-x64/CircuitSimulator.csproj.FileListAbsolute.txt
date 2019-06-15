@@ -1,0 +1,14 @@
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\hostpolicy.dll
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\hostfxr.dll
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\CircuitSimulator.exe
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\CircuitSimulator.deps.json
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\CircuitSimulator.runtimeconfig.json
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\CircuitSimulator.runtimeconfig.dev.json
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\CircuitSimulator.dll
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Release\netcoreapp2.2\win-x64\CircuitSimulator.pdb
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Release\netcoreapp2.2\win-x64\CircuitSimulator.csprojAssemblyReference.cache
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Release\netcoreapp2.2\win-x64\CircuitSimulator.csproj.CoreCompileInputs.cache
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Release\netcoreapp2.2\win-x64\CircuitSimulator.AssemblyInfoInputs.cache
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Release\netcoreapp2.2\win-x64\CircuitSimulator.AssemblyInfo.cs
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Release\netcoreapp2.2\win-x64\CircuitSimulator.dll
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Release\netcoreapp2.2\win-x64\CircuitSimulator.pdb

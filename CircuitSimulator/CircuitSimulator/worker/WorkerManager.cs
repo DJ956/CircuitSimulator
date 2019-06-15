@@ -41,7 +41,7 @@ namespace CircuitSimulator.worker
             this.patternes = patternes;
             this.faults = faults;
             this.port = port;
-            listener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
+            listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace CircuitSimulator.worker
             {
                 var client = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
                 workers.Add(client);
-                Console.WriteLine($"[{workers.Count}/{workerCount}] ワーカ追加:{client.Client.LocalEndPoint}");
+                Console.WriteLine($"[{workers.Count}/{workerCount}] ワーカ追加:{client.Client.RemoteEndPoint}");
             } while (workers.Count != workerCount);
 
             Console.WriteLine("ワーク開始");
@@ -120,8 +120,7 @@ namespace CircuitSimulator.worker
             var answersData = DataIO.Serialize(answers);
             var patternData = DataIO.Serialize(patternes);
             var splitFaults = SplitFaults(workers.Count);
-
-            //サーバーも故障シミュレーションを実行する
+            
             Parallel.Invoke(() =>
             {
                 Parallel.For(0, workers.Count, i =>
@@ -137,11 +136,12 @@ namespace CircuitSimulator.worker
                         //仕事結果受信
                         var count = ReceiveResult(stream);
                         Interlocked.Add(ref result, count);
-                        Console.WriteLine($"{worker.Client.LocalEndPoint}のワーク完了");
+                        Console.WriteLine($"{worker.Client.RemoteEndPoint}のワーク完了");
                     }
                     worker.Close();
                 });
             },
+            //サーバーも故障シミュレーションを実行する
                 () =>
                 {
                     var job = splitFaults.Last();

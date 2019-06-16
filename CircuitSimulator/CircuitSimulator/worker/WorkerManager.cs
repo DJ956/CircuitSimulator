@@ -12,7 +12,7 @@ namespace CircuitSimulator.worker
 {
     public class WorkerManager
     {
-        public static readonly int SPAN_SIZE = 40;
+        public static readonly int SPAN_SIZE = 50;
 
         private TcpListener listener;
         private int port;
@@ -170,16 +170,17 @@ namespace CircuitSimulator.worker
             var faultData = DataIO.Serialize(faults);
 
             //データプロトコル
-            var dataSpan = $"{answersData.Length},{circlesData.Length},{patternData.Length},{faultData.Length}";
-            if (dataSpan.Length < SPAN_SIZE)
+            var span = $"{answersData.Length},{circlesData.Length},{patternData.Length},{faultData.Length}";
+            if (span.Length < SPAN_SIZE)
             {
                 do
                 {
-                    dataSpan += ",";
-                } while (dataSpan.Length != SPAN_SIZE);
+                    span += ",";
+                } while (span.Length != SPAN_SIZE);
             }
-            var dataSpanData = Encoding.UTF8.GetBytes(dataSpan);            
-            stream.Write(dataSpanData, 0, dataSpan.Length);
+            var spanData = Encoding.UTF8.GetBytes(span);            
+            stream.Write(spanData, 0, spanData.Length);
+            Console.WriteLine("データスパン送信:" + span);
 
             stream.Write(answersData, 0, answersData.Length);            
             Console.WriteLine("答えデータ送信:" + answersData.Length);
@@ -191,7 +192,7 @@ namespace CircuitSimulator.worker
             Console.WriteLine("パターンデータ送信:" + patternData.Length);
 
             stream.Write(faultData, 0, faultData.Length);            
-            Console.WriteLine("故障データ送信:" + faultData.Length);
+            Console.WriteLine($"故障データ({faults.Count})送信:" + faultData.Length);
         }
 
         /// <summary>

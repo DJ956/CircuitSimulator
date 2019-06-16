@@ -22,6 +22,7 @@ namespace CircuitSimulator.command
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 Environment.Exit(-1);
             }
         }

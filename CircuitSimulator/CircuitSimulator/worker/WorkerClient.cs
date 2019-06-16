@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace CircuitSimulator.worker
 {
@@ -44,9 +45,13 @@ namespace CircuitSimulator.worker
             using (var stream = client.GetStream())
             {
                 var span = Encoding.UTF8.GetString(await ReadDataSpanAsync(stream, WorkerManager.SPAN_SIZE));
-                var spans = span.Split(",");                
+                Console.WriteLine("データスパン:" + span);
+                var spans = span.Split(",");
 
-                var src = await ReadDataAsync(stream);
+                int dataSize = int.Parse(spans[ANSWER_SPAN]) + int.Parse(spans[CIRCLE_SPAN]) +
+                    int.Parse(spans[PATTERN_SPAN]) + int.Parse(spans[FAULT_SPAN]);
+
+                var src = await ReadDataSpanAsync(stream, dataSize);
                 int seek = 0;
 
                 var answersData = new byte[int.Parse(spans[ANSWER_SPAN])];
@@ -69,17 +74,26 @@ namespace CircuitSimulator.worker
                 Console.WriteLine("必要データ受信完了");
                 Console.WriteLine("----------------------------------------");
 
-                var answers = DataIO.Deserialize(answersData) as List<List<bool>>;
-                var circles = DataIO.Deserialize(circlesData) as List<CircleData>;
-                var patterns = DataIO.Deserialize(patternData) as CirclePatternes;
-                var faults = DataIO.Deserialize(faultsData) as List<CircleFault>;
+                try
+                {
+                    var answers = DataIO.Deserialize(answersData) as List<List<bool>>;
+                    var circles = DataIO.Deserialize(circlesData) as List<CircleData>;
+                    var patterns = DataIO.Deserialize(patternData) as CirclePatternes;
+                    var faults = DataIO.Deserialize(faultsData) as List<CircleFault>;
 
-                pathFinder = new CircuitPathFinder(circles);
-                var result = pathFinder.FaultSimulatorAsync(patterns, answers, faults);
-                Console.WriteLine($"ジョブ終了 結果:{result.Count(r => r == true)}");
+                    pathFinder = new CircuitPathFinder(circles);
+                    var result = pathFinder.FaultSimulatorAsync(patterns, answers, faults);
+                    Console.WriteLine($"ジョブ終了 結果:{result.Count(r => r == true)}");
 
-                await SendResultAsync(stream, result);
-                Console.WriteLine("データ送信完了");
+                    await SendResultAsync(stream, result);
+                    Console.WriteLine("データ送信完了");
+                }
+                catch (SerializationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    Environment.Exit(-1);
+                }
             }
         }
 

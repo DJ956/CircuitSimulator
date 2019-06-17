@@ -51,7 +51,7 @@ namespace CircuitSimulator.worker
                 int dataSize = int.Parse(spans[ANSWER_SPAN]) + int.Parse(spans[CIRCLE_SPAN]) +
                     int.Parse(spans[PATTERN_SPAN]) + int.Parse(spans[FAULT_SPAN]);
 
-                var src = await ReadDataSpanAsync(stream, dataSize);
+                var src = await ReadDataAsync(stream, dataSize);
                 int seek = 0;
 
                 var answersData = new byte[int.Parse(spans[ANSWER_SPAN])];
@@ -118,19 +118,21 @@ namespace CircuitSimulator.worker
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        private async Task<byte[]> ReadDataAsync(NetworkStream stream)
+        private async Task<byte[]> ReadDataAsync(NetworkStream stream, int dataSize)
         {
             using (var memory = new MemoryStream())
             {
                 var buffer = new byte[4096];
+                int read = 0;
                 int resSize = 0;
                 do
                 {
                     resSize = await stream.ReadAsync(buffer, 0, buffer.Length);
+                    read += resSize;
                     if (resSize == 0) { break; }
 
                     await memory.WriteAsync(buffer, 0, resSize);
-                } while (stream.DataAvailable);
+                } while (stream.DataAvailable || read == dataSize);
 
                 await memory.FlushAsync();
                 return memory.ToArray();

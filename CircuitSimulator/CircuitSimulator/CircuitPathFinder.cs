@@ -167,6 +167,7 @@ namespace CircuitSimulator
                 faultCash[i] = pattern[i] == 1 ? true : false;
             }
             
+
             for (int i = 0; i < Circles.Count; i++)
             {
                 DetectValueSafe(faultCash, i, fault);
@@ -180,41 +181,44 @@ namespace CircuitSimulator
 
             return result;
         }
-        
 
-        private bool SimulationSafe(List<int> pattern, CircleFault fault, List<int> faultPath, List<bool> cash)
+
+        private bool SimulationSafe(CircleFault fault, List<int> faultPath, List<bool> cash)
         {
             var faultCash = new bool[Circles.Count];
             //値設定
-            for(int i = 0; i < faultCash.Length; i++)
+            for (int i = 0; i < faultCash.Length; i++)
             {
                 faultCash[i] = cash[i];
             }
 
+            faultPath.Sort((a, b) =>
+            {
+                var ai = Circles.FindIndex(c => c.Index == a);
+                var bi = Circles.FindIndex(c => c.Index == b);
+                return Circles[ai].Priority - Circles[bi].Priority;
+            });
+
             var allClear = new List<bool>(faultPath.Count);
-            foreach(var fp in faultPath)
+            foreach (var fp in faultPath)
             {
                 var i = Circles.FindIndex(c => c.Index == fp);
                 DetectValueSafe(faultCash, i, fault);
-                                
-                if(cash[i] == faultCash[i])
-                {                    
-                    allClear.Add(false);                    
+
+                if (cash[i] == faultCash[i])
+                {
+                    allClear.Add(false);
                 }
                 else { allClear.Add(true); }
             }
 
             var count = allClear.Count(a => a == false);
-            Console.WriteLine($"ALL:{faultPath.Count} {allClear.Count(a => a == false)}");
+            
             if (faultPath.Count == count)
             {
                 return false;
             }
             else { return true; }
-            var isDetect = (faultPath.Count - 1 == allClear.Count(a => a == false));            
-            //var isDetect = (allClear.Last() == true);
-            
-            return isDetect;
         }
 
         /// <summary>
@@ -238,6 +242,11 @@ namespace CircuitSimulator
                     //正常値
                     var answer = answers[i];
                     var p = circlePatternes.Patternes[i];
+                    var cash = circleValuesCash[i];
+
+                    //最初に発生した故障自体が元と同じなら終了する
+                    //var index = Circles.FindIndex(c => c.Index == f.FaultIndex);
+                    //if(cash[index] == f.FaultValue) { continue; }
 
                     //故障設定した状態でシミュレーション実行
                     var simResult = SimulationSafe(p, f);
@@ -271,22 +280,26 @@ namespace CircuitSimulator
         /// <param name="circlePatternes"></param>
         /// <param name="faults"></param>
         /// <returns></returns>
-        public List<bool> FaultSimulator(Dictionary<CircleFault, List<int>> faultPaths,CirclePatternes circlePatternes,
+        public List<bool> FaultSimulator(Dictionary<CircleFault, List<int>> faultPaths, CirclePatternes circlePatternes,
             List<CircleFault> faults)
         {
             var result = new BlockingCollection<bool>();
             //Parallel.ForEach(faults, f =>
-            foreach(var f in faults)
+            foreach (var f in faults)
             {
                 var isDetect = false;
 
                 for (int i = 0; i < circlePatternes.Patternes.Count; i++)
-                {                    
-                    var p = circlePatternes.Patternes[i];
+                {
+                    //var p = circlePatternes.Patternes[i];
                     var faultPath = faultPaths[f];
                     var cash = circleValuesCash[i];
-                    
-                    isDetect = SimulationSafe(p, f, faultPath, cash);
+
+                    //最初に発生した故障自体が元と同じなら終了する
+                    var index = Circles.FindIndex(c => c.Index == f.FaultIndex);
+                    if (cash[index] == f.FaultValue) { continue; }
+
+                    isDetect = SimulationSafe(f, faultPath, cash);
                     if (isDetect)
                     {
                         break;

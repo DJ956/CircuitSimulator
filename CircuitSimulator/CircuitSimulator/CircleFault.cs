@@ -17,10 +17,12 @@ namespace CircuitSimulator
         /// </summary>
         public bool FaultValue { get; set; }
 
+        public int Priority { get; set; } = -1;
+
         public CircleFault(int faultIndex, bool faultValue)
         {
             FaultIndex = faultIndex;
-            FaultValue = faultValue;
+            FaultValue = faultValue;            
         }
 
         public CircleFault() { }

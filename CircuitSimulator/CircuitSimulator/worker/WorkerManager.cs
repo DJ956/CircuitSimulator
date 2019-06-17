@@ -193,6 +193,8 @@ namespace CircuitSimulator.worker
 
             stream.Write(faultData, 0, faultData.Length);            
             Console.WriteLine($"故障データ({faults.Count})送信:" + faultData.Length);
+
+            stream.Flush();
         }
 
         /// <summary>

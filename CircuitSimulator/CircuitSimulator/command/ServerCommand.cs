@@ -28,14 +28,15 @@ namespace CircuitSimulator.command
             List<CircleFault> faults;
             CircuitPathFinder pathFinder;
             CircleDataBuilder builder;
+            CircleOutSideInputs outSideInputs;
 
             CommandManager.Initialize(tableName, faultName, patternName,
-                out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder);
+                out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder, out outSideInputs);
 
             var detectCount = -1;
             try
             {
-                var manager = new WorkerManager(port, workerCount, answers, circles, circlePatternes, faults);
+                var manager = new WorkerManager(port, workerCount, answers, circles, circlePatternes, faults, outSideInputs);
                 detectCount = manager.StartAsync().Result;
             }
             catch (Exception ex)

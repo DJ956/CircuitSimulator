@@ -13,7 +13,7 @@ namespace CircuitSimulator
         /// 答えソートリストを作成する
         /// </summary>
         /// <param name="circles"></param>
-        public CircuitPathFinder(List<CircleData> circles)
+        public CircuitPathFinder(List<CircleData> circles, CircleOutSideInputs outSideInputs)
         {            
             Circles = circles;
             indexDict = new Dictionary<int, int>(circles.Count);
@@ -27,10 +27,21 @@ namespace CircuitSimulator
                     sortedIndex.Add(c.Inputs[0], i);
                 }
             }
+
+            var pilist = new List<int>(outSideInputs.OutSideInputs.Count);
+            foreach(var piIndex in outSideInputs.OutSideInputs)
+            {
+                pilist.Add(indexDict[piIndex]);
+            }
+
+            withoutPiIndexlist = Enumerable.Range(0, circles.Count).Where(index => !pilist.Contains(index)).ToList();
         }
 
         public List<CircleData> Circles { get; private set; }        
 
+        /// <summary>
+        /// POのソートされた配列Indexリスト
+        /// </summary>
         private SortedDictionary<int, int> sortedIndex;
 
         /// <summary>
@@ -42,6 +53,11 @@ namespace CircuitSimulator
         /// 回路データの値のキャッシュ
         /// </summary>
         private List<List<bool>> circleValuesCash;
+
+        /// <summary>
+        /// PI以外の配列Indexのシーケンス
+        /// </summary>
+        private List<int> withoutPiIndexlist;
 
         /// <summary>
         /// 入力パターン選択,CircleDataのValueの初期化
@@ -60,7 +76,6 @@ namespace CircuitSimulator
             //外部入力のリストを見て行わないと狂う。
             foreach (KeyValuePair<int, int> p in pattern)
             {
-                //var index = Circles.FindIndex(c => c.Index == p.Key);
                 var index = indexDict[p.Key];
                 Circles[index].Value = p.Value == 1 ? true : false;                                
             }            
@@ -77,8 +92,7 @@ namespace CircuitSimulator
             var inputsValues = new bool[inputsIndexes.Length]; //入力のindexたちが保有するvalue値
             for (int j = 0; j < inputsValues.Length; j++)
             {
-                var index = inputsIndexes[j];
-                //var target = Circles.Find(c => c.Index == index);                
+                var index = inputsIndexes[j];         
                 var target = Circles[indexDict[index]];
                 inputsValues[j] = target.Value;
             }
@@ -99,7 +113,6 @@ namespace CircuitSimulator
             for (int j = 0; j < inputsIndexes.Length; j++)
             {
                 var index = inputsIndexes[j];
-                //var targetIndex = Circles.FindIndex(c => c.Index == index);
                 var targetIndex = indexDict[index];
                 result[j] = cash[targetIndex];
             }
@@ -130,13 +143,14 @@ namespace CircuitSimulator
             var c = Circles[i];
             var type = Circles[i].CircuitType;
             //PIは値を設定する必要がないので飛ばす。このif文を挟まないとe2670以降の値が正常ではなくなるが、えらく遅くなる(15倍)
+            /*
             if (type == CircuitType.PI)
             {
                 //もし故障個所がPIならば設定しておく。
                 if (c.Index == fault.FaultIndex) { faultCash[i] = fault.FaultValue; }
                 return;
             }
-            
+            */
             var inputs = GetInputsSafe(faultCash, i);
             faultCash[i] = GateFunctions.Execute(type, inputs, c, fault);
         }
@@ -191,11 +205,19 @@ namespace CircuitSimulator
                 var index = indexDict[p.Key];
                 faultCash[index] = p.Value == 1 ? true : false;
             }
-            
+
+            var faultArrayIndex = indexDict[fault.FaultIndex];
+            faultCash[faultArrayIndex] = fault.FaultValue;
+            foreach(var i in withoutPiIndexlist)
+            {
+                DetectValueSafe(faultCash, i, fault);
+            }
+            /*
             for (int i = 0; i < Circles.Count; i++)
             {
                 DetectValueSafe(faultCash, i, fault);
             }
+            */
                         
             var result = new List<bool>(sortedIndex.Count);
             foreach (KeyValuePair<int, int> item in sortedIndex)
@@ -269,7 +291,6 @@ namespace CircuitSimulator
                     var cash = circleValuesCash[i];
 
                     //最初に発生した故障自体が元と同じなら終了する
-                    //var index = Circles.FindIndex(c => c.Index == f.FaultIndex);
                     var index = indexDict[f.FaultIndex];
                     if(cash[index] == f.FaultValue) { continue; }
 

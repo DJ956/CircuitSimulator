@@ -23,8 +23,9 @@ namespace CircuitSimulator.command
             List<CircleFault> faults;
             CircuitPathFinder pathFinder;
             CircleDataBuilder builder;
+            CircleOutSideInputs outSideInputs;
             CommandManager.Initialize(tableName, faultName, patternName,
-                out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder);
+                out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder, out outSideInputs);
 
             var start = DateTime.Now;
             //故障シミュレーション実行            

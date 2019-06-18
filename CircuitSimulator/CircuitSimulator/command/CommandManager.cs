@@ -49,7 +49,7 @@ namespace CircuitSimulator.command
 
         public static void Initialize(string tableName, string faultName, string patternName,
             out List<CircleData> circles, out CirclePatternes patternes, out List<List<bool>> answers, out List<CircleFault> faults,
-            out CircuitPathFinder pathFinder, out CircleDataBuilder builder)
+            out CircuitPathFinder pathFinder, out CircleDataBuilder builder, out CircleOutSideInputs outSideInputs)
         {
             builder = new CircleDataBuilder();
 
@@ -57,8 +57,9 @@ namespace CircuitSimulator.command
             var circleInputs = circleRawData.CircleInputs;
             circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
             faults = DataIO.LoadCircleFaultsFromTxtAsync(faultName).Result;
+            outSideInputs = circleRawData.CircleOutSideInputs;
 
-            pathFinder = new CircuitPathFinder(circles);
+            pathFinder = new CircuitPathFinder(circles, outSideInputs);
 
             //シミュレーション実行&結果出力            
             patternes = DataIO.LoadCirclePatternesFromTxtAsync(patternName, circleRawData.CircleOutSideInputs).Result;

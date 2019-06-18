@@ -22,6 +22,7 @@ namespace CircuitSimulator.worker
         private List<CircleFault> faults;
         private List<CircleData> circles;
         private CirclePatternes patternes;
+        private CircleOutSideInputs outSideInputs;
 
         /// <summary>
         /// 故障シミュレーションを並列分散処理で行う
@@ -33,7 +34,7 @@ namespace CircuitSimulator.worker
         /// <param name="patternes">入力パターン</param>
         /// <param name="faults">故障リスト</param>
         public WorkerManager(int port, int workerCount, List<List<bool>> answers, List<CircleData> circles,
-            CirclePatternes patternes, List<CircleFault> faults)
+            CirclePatternes patternes, List<CircleFault> faults, CircleOutSideInputs outSideInputs)
         {
             this.workerCount = workerCount;
             this.answers = answers;            
@@ -41,6 +42,7 @@ namespace CircuitSimulator.worker
             this.patternes = patternes;
             this.faults = faults;
             this.port = port;
+            this.outSideInputs = outSideInputs;
             listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
         }
 
@@ -123,6 +125,7 @@ namespace CircuitSimulator.worker
             var answersData = DataIO.Serialize(answers);
             var patternData = DataIO.Serialize(patternes);
             var splitFaults = SplitFaults(workers.Count);
+            var outsideInputsData = DataIO.Serialize(outSideInputs);
             
             Parallel.Invoke(() =>
             {
@@ -135,7 +138,7 @@ namespace CircuitSimulator.worker
                     using (var stream = worker.GetStream())
                     {
                         //仕事内容送信
-                        SendCircleData(stream, answersData, circleData, patternData, jobFault);
+                        SendCircleData(stream, answersData, circleData, patternData, jobFault, outsideInputsData);
                         //仕事結果受信
                         var count = ReceiveResult(stream);
                         Interlocked.Add(ref result, count);
@@ -148,7 +151,7 @@ namespace CircuitSimulator.worker
                 () =>
                 {
                     var job = splitFaults.Last();
-                    var pathFinder = new CircuitPathFinder(circles);
+                    var pathFinder = new CircuitPathFinder(circles, null);
                     var cnt = pathFinder.FaultSimulatorAsync(patternes, answers, job);
                     Interlocked.Add(ref result, cnt.Count(r => r == true));
                     Console.WriteLine($"自機のワーク完了");
@@ -165,12 +168,12 @@ namespace CircuitSimulator.worker
         /// <param name="faults"></param>
         /// <returns></returns>
         private void SendCircleData(NetworkStream stream, byte[] answersData, byte[] circlesData, byte[] patternData,
-            List<CircleFault> faults)
+            List<CircleFault> faults, byte[] outsideInputsData)
         {
             var faultData = DataIO.Serialize(faults);
 
             //データプロトコル
-            var span = $"{answersData.Length},{circlesData.Length},{patternData.Length},{faultData.Length}";
+            var span = $"{answersData.Length},{circlesData.Length},{patternData.Length},{faultData.Length},{outsideInputsData.Length}";
             if (span.Length < SPAN_SIZE)
             {
                 do
@@ -193,6 +196,9 @@ namespace CircuitSimulator.worker
 
             stream.Write(faultData, 0, faultData.Length);            
             Console.WriteLine($"故障データ({faults.Count})送信:" + faultData.Length);
+
+            stream.Write(outsideInputsData, 0, outsideInputsData.Length);
+            Console.WriteLine("外部入力データ送信:" + outsideInputsData.Length);
 
             stream.Flush();
         }

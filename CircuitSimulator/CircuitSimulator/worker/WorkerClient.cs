@@ -15,6 +15,7 @@ namespace CircuitSimulator.worker
         private static readonly int CIRCLE_SPAN = 1;
         private static readonly int PATTERN_SPAN = 2;
         private static readonly int FAULT_SPAN = 3;
+        private static readonly int OUTSIDEINPUTS_SPAN = 4;
 
         private string address;
         private int port;
@@ -49,7 +50,7 @@ namespace CircuitSimulator.worker
                 var spans = span.Split(",");
 
                 int dataSize = int.Parse(spans[ANSWER_SPAN]) + int.Parse(spans[CIRCLE_SPAN]) +
-                    int.Parse(spans[PATTERN_SPAN]) + int.Parse(spans[FAULT_SPAN]);
+                    int.Parse(spans[PATTERN_SPAN]) + int.Parse(spans[FAULT_SPAN]) + int.Parse(spans[OUTSIDEINPUTS_SPAN]);
 
                 var src = await ReadDataAsync(stream, dataSize);
                 int seek = 0;
@@ -65,11 +66,15 @@ namespace CircuitSimulator.worker
                 seek += int.Parse(spans[PATTERN_SPAN]);
                 var faultsData = new byte[int.Parse(spans[FAULT_SPAN])];
                 Buffer.BlockCopy(src, seek, faultsData, 0, faultsData.Length);
+                seek += int.Parse(spans[FAULT_SPAN]);
+                var outsideInputsData = new byte[int.Parse(spans[OUTSIDEINPUTS_SPAN])];
+                Buffer.BlockCopy(src, seek, outsideInputsData, 0, outsideInputsData.Length);
 
                 Console.WriteLine("答えデータ:" + answersData.Length);
                 Console.WriteLine("回路データ:" + circlesData.Length);
                 Console.WriteLine("パターンデータ:" + patternData.Length);
                 Console.WriteLine("故障データ:" + faultsData.Length);
+                Console.WriteLine("外部入力データ:" + outsideInputsData.Length);
 
                 Console.WriteLine("必要データ受信完了");
                 Console.WriteLine("----------------------------------------");
@@ -80,8 +85,9 @@ namespace CircuitSimulator.worker
                     var circles = DataIO.Deserialize(circlesData) as List<CircleData>;
                     var patterns = DataIO.Deserialize(patternData) as CirclePatternes;
                     var faults = DataIO.Deserialize(faultsData) as List<CircleFault>;
+                    var outsideInputs = DataIO.Deserialize(outsideInputsData) as CircleOutSideInputs;
 
-                    pathFinder = new CircuitPathFinder(circles);
+                    pathFinder = new CircuitPathFinder(circles, outsideInputs);
                     var result = pathFinder.FaultSimulatorAsync(patterns, answers, faults);
                     Console.WriteLine($"ジョブ終了 結果:{result.Count(r => r == true)}");
 

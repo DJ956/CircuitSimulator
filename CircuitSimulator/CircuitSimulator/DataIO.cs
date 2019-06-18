@@ -167,7 +167,7 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName)
+        /*public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName)
         {
             List<List<int>> results = null;
             try
@@ -189,6 +189,43 @@ namespace CircuitSimulator
                         {
                             row.Add(int.Parse(str));
                         }
+                        results.Add(row);
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+                Environment.Exit(-1);
+            }
+            return new CirclePatternes(results);
+        }*/
+
+
+        public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName, CircleOutSideInputs outSideInputs)
+        {
+            List<Dictionary<int, int>> results = null;
+            try
+            {
+                const char split = ' ';
+                var path = Path.Combine(ROOT, fileName);
+                using (var reader = new StreamReader(path, false))
+                {
+                    var count = int.Parse(await reader.ReadLineAsync());
+                    results = new List<Dictionary<int, int>>(count);
+                    
+                    for (int i = 0; i < count; i++)
+                    {                        
+                        var line = await reader.ReadLineAsync();
+                        line = line.TrimStart();
+                        var lines = line.Split(split);
+                        var row = new Dictionary<int, int>(lines.Length);
+
+                        for (int j = 0; j < lines.Length; j++)
+                        {
+                            row.Add(outSideInputs.OutSideInputs[j], int.Parse(lines[j]));
+                        }
+
                         results.Add(row);
                     }
                 }

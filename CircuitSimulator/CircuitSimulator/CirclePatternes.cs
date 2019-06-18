@@ -8,8 +8,14 @@ namespace CircuitSimulator
     {        
         public CirclePatternes() { }
 
-        public List<List<int>> Patternes { get; set; }
+        /// <summary>
+        /// Key=回路Index Value=回路の値
+        /// </summary>
+        public List<Dictionary<int, int>> Patternes { get; set; }
 
-        public CirclePatternes(List<List<int>> patternes) { Patternes = patternes; }
+        public CirclePatternes(List<Dictionary<int, int>> keyValues)
+        {
+            Patternes = keyValues;
+        }
     }
 }

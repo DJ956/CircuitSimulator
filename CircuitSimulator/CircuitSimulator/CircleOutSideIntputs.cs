@@ -3,10 +3,20 @@ using System.Collections.Generic;
 
 namespace CircuitSimulator
 {
-    public class CircleOutSizeInputs
+    public class CircleOutSideInputs
     {        
         public List<int> OutSideInputs { get; private set; }
 
-        public CircleOutSizeInputs(List<int> outsideInputs) { OutSideInputs = outsideInputs; }
+        public CircleOutSideInputs(List<int> outsideInputs) { OutSideInputs = outsideInputs; }
+
+        public override string ToString()
+        {
+            var result = "";
+            foreach(var i in OutSideInputs)
+            {
+                result += i + "\n";
+            }
+            return result;
+        }
     }
 }

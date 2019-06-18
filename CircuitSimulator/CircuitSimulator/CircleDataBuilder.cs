@@ -23,43 +23,45 @@ namespace CircuitSimulator
         private void DetectPriority(List<CircleData> circles)
         {
             var priority = new Queue<int>(Enumerable.Range(0, circles.Count));
-            
+
             do
-            {
+            {               
                 foreach (var c in circles)
                 {
                     if (c.Already) { continue; }                    
-
-                    var type = c.CircuitType;
-                    if (type == CircuitType.PI) { c.Priority = priority.Dequeue(); }
-                    else //PI以外
+                    //PI                    
+                    if (c.CircuitType == CircuitType.PI)
                     {
-                        var inputs = c.Inputs;
-                        //入力が1つのみの場合
-                        if (inputs.Length == 1)
-                        {
-                            var index = inputs[0] - 1;
-                            //入力が1ならば優先順位を割り当てる
-                            if (circles[index].Priority != -1) { c.Priority = priority.Dequeue(); }
-
-                        }//入力が2つ以上の場合
-                        else
-                        {
-                            var allAlready = true;                            
-                            //全ての入力線が演算順序決定済みか調べる。
-                            for (int i = 0; i < inputs.Length; i++)
-                            {
-                                var index = inputs[i] - 1;
-                                if (!circles[index].Already)
-                                {
-                                    allAlready = false;
-                                    break;
-                                }
-                            }
-                            //全ての入力線が順序決定済みの場合
-                            if (allAlready) { c.Priority = priority.Dequeue(); }                            
-                        }
+                        c.Priority = priority.Dequeue();
+                        continue;
                     }
+
+                    var inputs = c.Inputs;
+                    //入力が1つのみの場合
+                    if (inputs.Length == 1)
+                    {
+                        var index = inputs[0] - 1;
+                        //入力が1ならば優先順位を割り当てる
+                        if (circles[index].Priority != -1) { c.Priority = priority.Dequeue(); }
+
+                    }//入力が2つ以上の場合
+                    else
+                    {
+                        var allAlready = true;
+                        //全ての入力線が演算順序決定済みか調べる。
+                        for (int i = 0; i < inputs.Length; i++)
+                        {
+                            var index = inputs[i] - 1;
+                            if (!circles[index].Already)
+                            {
+                                allAlready = false;
+                                break;
+                            }
+                        }
+                        //全ての入力線が順序決定済みの場合
+                        if (allAlready) { c.Priority = priority.Dequeue(); }
+                    }
+
                 }
             } while (priority.Count != 0);
 
@@ -93,7 +95,7 @@ namespace CircuitSimulator
                     var start = list[INPUT_INDEX] - 1;
                     for (int i = 0; i < inputCount; i++)
                     {
-                        inputs[i] = circleInputs.Inputs[start + i];
+                        inputs[i] = circleInputs.Inputs[start + i];                        
                     }
                 }//1の時、3列目は入力数を示す
                 else { inputs = new int[1] { list[INPUT_INDEX] }; }

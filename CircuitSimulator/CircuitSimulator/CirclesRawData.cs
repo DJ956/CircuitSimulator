@@ -8,7 +8,7 @@ namespace CircuitSimulator
     {
         public List<List<int>> CircleRawlist { get; private set; }
         public CircleInputs CircleInputs { get; private set; }
-        public CircleOutSizeInputs CircleOutSideInputs { get; private set; }
+        public CircleOutSideInputs CircleOutSideInputs { get; private set; }
         public CircleOutsideOutputs CirclesOutSideOutputs { get; private set; }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace CircuitSimulator
         {
             CircleRawlist = circleRawlist;
             CircleInputs = new CircleInputs(inputs);
-            CircleOutSideInputs = new CircleOutSizeInputs(outsideInputs);
+            CircleOutSideInputs = new CircleOutSideInputs(outsideInputs);
             CirclesOutSideOutputs = new CircleOutsideOutputs(outsideOutputs);
         }
 

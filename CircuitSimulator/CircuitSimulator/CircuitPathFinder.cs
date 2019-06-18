@@ -14,7 +14,7 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="circles"></param>
         public CircuitPathFinder(List<CircleData> circles)
-        {
+        {            
             Circles = circles;
             sortedIndex = new SortedDictionary<int, int>();
             for (int i = 0; i < circles.Count; i++)
@@ -27,7 +27,7 @@ namespace CircuitSimulator
             }
         }
 
-        public List<CircleData> Circles { get; private set; }
+        public List<CircleData> Circles { get; private set; }        
 
         private SortedDictionary<int, int> sortedIndex;
 
@@ -42,19 +42,20 @@ namespace CircuitSimulator
         /// <param name="circles"></param>
         /// <param name="patternes"></param>
         /// <param name="selectPatternIndex"></param>
-        private void Initialize(List<int> pattern)
+        private void Initialize(Dictionary<int, int> pattern)
         {
             if (circleValuesCash == null) { circleValuesCash = new List<List<bool>>(); }
-
             //回路データの値の初期化
-            Parallel.ForEach(Circles, c => c.Value = false);
-
+            //Parallel.ForEach(Circles, c => c.Value = false);
+            foreach(var c in Circles) { c.Value = false; }
+            
             //外部入力値設定            
-            for (int i = 0; i < pattern.Count; i++)
-            {
-                var p = pattern[i];
-                Circles[i].Value = p == 1 ? true : false;
-            }
+            //外部入力のリストを見て行わないと狂う。
+            foreach (KeyValuePair<int, int> p in pattern)
+            {                                               
+                var index = Circles.FindIndex(c => c.Index == p.Key);
+                Circles[index].Value = p.Value == 1 ? true : false;                                
+            }            
         }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace CircuitSimulator
         /// <param name="pattern">入力パターン</param>
         /// <param name="saveCash">キャッシュデータを保存するか否か</param>
         /// <returns>論理回路の出力結果</returns>
-        public List<bool> Simulation(List<int> pattern, bool saveCash)
+        public List<bool> Simulation(Dictionary<int, int> pattern, bool saveCash)
         {
             Initialize(pattern);
             List<bool> cash = null;
@@ -136,7 +137,10 @@ namespace CircuitSimulator
             if (saveCash) {cash = new List<bool>(Circles.Count); }
             for (int i = 0; i < Circles.Count; i++)
             {
-                FindPath(i);
+                if (Circles[i].CircuitType != CircuitType.PI)
+                {
+                    FindPath(i);
+                }
                 if (saveCash) { cash.Add(Circles[i].Value); }
             }
 
@@ -148,7 +152,7 @@ namespace CircuitSimulator
             }
             //キャッシュのリストの追加
             if (saveCash) { circleValuesCash.Add(cash); }
-            
+
             return result;
         }
 
@@ -158,16 +162,16 @@ namespace CircuitSimulator
         /// <param name="pattern"></param>
         /// <param name="fault"></param>
         /// <returns></returns>
-        private List<bool> SimulationSafe(List<int> pattern, CircleFault fault)
+        private List<bool> SimulationSafe(Dictionary<int, int> pattern, CircleFault fault)
         {                        
             var faultCash = new bool[Circles.Count];
             //入力パターン設定
-            for (int i = 0; i < pattern.Count; i++)
+            foreach (KeyValuePair<int, int> p in pattern)
             {
-                faultCash[i] = pattern[i] == 1 ? true : false;
+                var index = Circles.FindIndex(c => c.Index == p.Key);
+                faultCash[index] = p.Value == 1 ? true : false;
             }
             
-
             for (int i = 0; i < Circles.Count; i++)
             {
                 DetectValueSafe(faultCash, i, fault);
@@ -245,8 +249,8 @@ namespace CircuitSimulator
                     var cash = circleValuesCash[i];
 
                     //最初に発生した故障自体が元と同じなら終了する
-                    //var index = Circles.FindIndex(c => c.Index == f.FaultIndex);
-                    //if(cash[index] == f.FaultValue) { continue; }
+                    var index = Circles.FindIndex(c => c.Index == f.FaultIndex);
+                    if(cash[index] == f.FaultValue) { continue; }
 
                     //故障設定した状態でシミュレーション実行
                     var simResult = SimulationSafe(p, f);
@@ -305,7 +309,6 @@ namespace CircuitSimulator
                         break;
                     }
                 }
-                Console.WriteLine("//////////");
                 result.TryAdd(isDetect);
             }//);
 

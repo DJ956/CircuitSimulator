@@ -686,23 +686,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\B4_2019\\.nuget\\packages\\": {},
+    "C:\\Users\\dexte\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "2.0.3",
     "restore": {
-      "projectUniqueName": "C:\\Github\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator.csproj",
+      "projectUniqueName": "H:\\Documents\\GitHub\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator.csproj",
       "projectName": "CircuitSimulator",
-      "projectPath": "C:\\Github\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator.csproj",
-      "packagesPath": "C:\\Users\\B4_2019\\.nuget\\packages\\",
-      "outputPath": "C:\\Github\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator\\obj\\",
+      "projectPath": "H:\\Documents\\GitHub\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator.csproj",
+      "packagesPath": "C:\\Users\\dexte\\.nuget\\packages\\",
+      "outputPath": "H:\\Documents\\GitHub\\CircuitSimulator\\CircuitSimulator\\CircuitSimulator\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\B4_2019\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\dexte\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

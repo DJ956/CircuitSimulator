@@ -61,7 +61,7 @@ namespace CircuitSimulator.command
             pathFinder = new CircuitPathFinder(circles);
 
             //シミュレーション実行&結果出力            
-            patternes = DataIO.LoadCirclePatternesFromTxtAsync(patternName).Result;
+            patternes = DataIO.LoadCirclePatternesFromTxtAsync(patternName, circleRawData.CircleOutSideInputs).Result;
             answers = new List<List<bool>>(patternes.Patternes.Count);
 
             foreach (var p in patternes.Patternes)

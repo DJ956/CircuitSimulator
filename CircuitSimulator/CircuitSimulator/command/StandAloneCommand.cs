@@ -36,7 +36,7 @@ namespace CircuitSimulator.command
 
             var detectCount = faultResults.Count(f => f == true);
 
-            CommandManager.SaveResult(tableName, circles, answers, faults.Count, detectCount);
+            CommandManager.SaveResult(tableName, circles, answers, faults.Count, detectCount);            
         }
 
         public string GetCommandType()

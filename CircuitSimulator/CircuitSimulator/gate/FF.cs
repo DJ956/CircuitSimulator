@@ -15,10 +15,7 @@ namespace CircuitSimulator.gate
             throw new NotImplementedException();
         }
 
-        public CircuitType GetCircuitType()
-        {
-            return CircuitType.FF;
-        }
+        public CircuitType GetCircuitType() { return CircuitType.FF; }
 
         public static IGate GetInstance()
         {

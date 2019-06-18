@@ -117,9 +117,18 @@ namespace CircuitSimulator
         /// <param name="fault">故障個所</param>
         private void DetectValueSafe(bool[] faultCash, int i, CircleFault fault)
         {
+            var c = Circles[i];
             var type = Circles[i].CircuitType;
+            //PIは値を設定する必要がないので飛ばす            
+            if(type == CircuitType.PI)
+            {
+                //もし故障個所がPIならば設定しておく。
+                if(c.Index == fault.FaultIndex) { faultCash[i] = fault.FaultValue; }
+                return;
+            }
+            
             var inputs = GetInputsSafe(faultCash, i);
-            faultCash[i] = GateFunctions.Execute(type, inputs, Circles[i], fault);
+            faultCash[i] = GateFunctions.Execute(type, inputs, c, fault);
         }
 
         /// <summary>

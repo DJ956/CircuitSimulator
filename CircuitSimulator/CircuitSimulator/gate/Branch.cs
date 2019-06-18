@@ -18,10 +18,7 @@ namespace CircuitSimulator.gate
             return inputs[0];            
         }
 
-        public CircuitType GetCircuitType()
-        {
-            return CircuitType.branch;
-        }
+        public CircuitType GetCircuitType() { return CircuitType.branch; }
 
         public bool EquivalentFailure(bool[] normalInputs, bool[] faultInputs)
         {

@@ -88,10 +88,11 @@ namespace CircuitSimulator.worker
                     var outsideInputs = DataIO.Deserialize(outsideInputsData) as CircleOutSideInputs;
 
                     pathFinder = new CircuitPathFinder(circles, outsideInputs);
-                    var result = pathFinder.FaultSimulatorAsync(patterns, answers, faults);
-                    Console.WriteLine($"ジョブ終了 結果:{result.Count(r => r == true)}");
+                    var result = pathFinder.FaultSimulatorAsync(answers, faults);
+                    var detectCount = result.Count(r => r == true);
+                    Console.WriteLine($"ジョブ終了 結果:{detectCount}");
 
-                    await SendResultAsync(stream, result);
+                    await SendResultAsync(stream, detectCount);
                     Console.WriteLine("データ送信完了");
                 }
                 catch (SerializationException ex)
@@ -151,9 +152,9 @@ namespace CircuitSimulator.worker
         /// <param name="stream"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        private async Task SendResultAsync(NetworkStream stream, List<bool> result)
+        private async Task SendResultAsync(NetworkStream stream, int result)
         {
-            var msg = $"{result.Count(r => r == true)}\n";
+            var msg = $"{result}\n";
             var msgData = Encoding.UTF8.GetBytes(msg);
             await stream.WriteAsync(msgData, 0, msgData.Length);
             await stream.FlushAsync();

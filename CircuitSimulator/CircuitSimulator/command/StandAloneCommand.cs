@@ -29,9 +29,7 @@ namespace CircuitSimulator.command
 
             var start = DateTime.Now;
             //故障シミュレーション実行            
-            var faultResults = pathFinder.FaultSimulatorAsync(circlePatternes, answers, faults);
-            //var faultPaths = builder.CreateFaultPath(circles, faults);
-            //var faultResults = pathFinder.FaultSimulator(faultPaths, circlePatternes, faults);
+            var faultResults = pathFinder.FaultSimulatorAsync(answers, faults);            
             var end = DateTime.Now;
             Console.WriteLine($"処理時間:{(end - start).TotalSeconds}/s");
 

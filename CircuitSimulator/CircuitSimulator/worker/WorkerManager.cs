@@ -152,7 +152,7 @@ namespace CircuitSimulator.worker
                 {
                     var job = splitFaults.Last();
                     var pathFinder = new CircuitPathFinder(circles, null);
-                    var cnt = pathFinder.FaultSimulatorAsync(patternes, answers, job);
+                    var cnt = pathFinder.FaultSimulatorAsync(answers, job);
                     Interlocked.Add(ref result, cnt.Count(r => r == true));
                     Console.WriteLine($"自機のワーク完了");
                 }

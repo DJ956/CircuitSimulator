@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -10,7 +11,7 @@ namespace CircuitSimulator
     {
         public static readonly string ROOT = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             "Circle");
-        private static readonly string SPLIT = "	";
+        private static readonly string PATTERN = @"-*[\d]+";
 
         static DataIO()
         {
@@ -41,6 +42,13 @@ namespace CircuitSimulator
             catch (IOException ex)
             {
                 Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                Environment.Exit(-1);
+            }
+            catch(FormatException ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 Environment.Exit(-1);
             }
             return result;
@@ -63,13 +71,11 @@ namespace CircuitSimulator
                     result = new List<CircleFault>(count);
                     for (int i = 0; i < count; i++)
                     {
-                        var line = await reader.ReadLineAsync();
-                        line = line.TrimStart();
-                        var lines = line.Split(SPLIT);
-                        if (lines.Length > 2) { throw new FormatException($"{fileName}のフォーマットが不正です。"); }
+                        var line = await reader.ReadLineAsync();                        
+                        var matches = Regex.Matches(line, PATTERN);
+                        var faultIndex = int.Parse(matches[0].Value);
+                        var faultValue = matches[1].Value == "1" ? true : false;
 
-                        var faultIndex = int.Parse(lines[0]);
-                        var faultValue = lines[1] == "1" ? true : false;
                         result.Add(new CircleFault(faultIndex, faultValue));
                     }
                 }
@@ -93,24 +99,29 @@ namespace CircuitSimulator
         {
             List<List<int>> result = null;
 
-            //最初の空行を読み飛ばす
-            await reader.ReadLineAsync();
+            var count = -1;
+
             //データ数読み取り
-            var count = int.Parse(await reader.ReadLineAsync());
+            //最初の空行を読み飛ばす たまに最初が空行ではない場合があるので判定する。
+            var first = await reader.ReadLineAsync();
+            //空文字だった場合次を読み込んでカウントを設定する。
+            if (first.Length == 0) { count = int.Parse(await reader.ReadLineAsync()); }
+            //空文字でなければそれはカウントなので設定する。
+            else { count = int.Parse(first); }
+
             result = new List<List<int>>(count);
 
             for (int i = 0; i < count; i++)
             {
                 var line = await reader.ReadLineAsync();
-                //データ加工
-                line = line.TrimStart();
-                var lines = line.Split(SPLIT);
-
-                var row = new List<int>(lines.Length);
-                foreach (var str in lines)
+                
+                var matches = Regex.Matches(line, PATTERN);
+                var row = new List<int>(matches.Count);
+                foreach (Match m in matches)
                 {
-                    row.Add(int.Parse(str));
+                    row.Add(int.Parse(m.Value));
                 }
+
                 result.Add(row);
 
             }
@@ -160,47 +171,7 @@ namespace CircuitSimulator
         private async static Task<List<int>> LoadCircleOutsideOutputsFromTxtAsync(StreamReader reader)
         {
             return await LoadCircleOutSideInputsFromTxtAsync(reader);
-        }
-
-        /// <summary>
-        /// txtから入力パターン読み込む。処理内容はリスト1の回路データを読み込むやつと同じなので使いまわす。
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        /*public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName)
-        {
-            List<List<int>> results = null;
-            try
-            {
-                char split = ' ';
-                var path = Path.Combine(ROOT, fileName);
-                using (var reader = new StreamReader(path, false))
-                {
-                    var count = int.Parse(await reader.ReadLineAsync());
-                    results = new List<List<int>>(count);
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var line = await reader.ReadLineAsync();
-                        line = line.TrimStart();
-                        var lines = line.Split(split);
-                        var row = new List<int>(lines.Length);
-                        foreach (var str in lines)
-                        {
-                            row.Add(int.Parse(str));
-                        }
-                        results.Add(row);
-                    }
-                }
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine(ex.Message);
-                Environment.Exit(-1);
-            }
-            return new CirclePatternes(results);
-        }*/
-
+        }      
 
         public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName, CircleOutSideInputs outSideInputs)
         {

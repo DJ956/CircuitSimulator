@@ -189,7 +189,7 @@ namespace CircuitSimulator
         private List<bool> SimulationSafe(CircleFault fault, List<bool> cash)
         {
             var faultCash = new List<bool>(cash);
-                       
+                                   
             var faultArrayIndex = indexDict[fault.FaultIndex];
             faultCash[faultArrayIndex] = fault.FaultValue;
             foreach (var i in withoutPiIndexlist)
@@ -197,6 +197,68 @@ namespace CircuitSimulator
                 if (i < faultArrayIndex) { continue; }
                 DetectValueSafe(faultCash, i, fault);
             }
+            
+            var result = new List<bool>(sortedIndex.Count);
+            foreach (KeyValuePair<int, int> item in sortedIndex)
+            {
+                result.Add(faultCash[item.Value]);
+            }
+
+            return result;
+        }
+
+        private List<bool> SimulationRouteSafe(CircleFault fault, List<bool> cash)
+        {
+            var faultCash = new List<bool>(cash);
+            var arrayIndex = indexDict[fault.FaultIndex];
+
+            faultCash[arrayIndex] = fault.FaultValue;
+
+            var path = new Tuple<int, int>(Circles[arrayIndex].Priority, arrayIndex);
+
+            //var routes = new Queue<int>();
+            //Tuple<int, int> Item1 = Priority Item2 = Index
+            var routes = new PriorityQueue<Tuple<int, int>>((x, y) => x.Item1 - y.Item1);
+            routes.Enqueue(path);
+            
+            do
+            {
+                 path = routes.Dequeue();
+                //先頭の伝搬が終わるまでやる
+                do
+                {
+                    
+                    if (Circles[path.Item2].CircuitType != CircuitType.PI)
+                    {
+                        DetectValueSafe(faultCash, path.Item2, fault);
+                    }
+                    
+                    //DetectValueSafe(faultCash, path.Item2, fault);
+
+                    if (faultCash[path.Item2] == cash[path.Item2]) { break; }
+
+
+                    var outs = Circles[path.Item2].Outs;
+                    if (outs.Length > 1)
+                    {
+                        arrayIndex = indexDict[outs[0]];
+                        path = new Tuple<int, int>(Circles[arrayIndex].Priority, arrayIndex);
+                        for (int i = 1; i < outs.Length; i++)
+                        {
+                            arrayIndex = indexDict[outs[i]];
+                            routes.Enqueue(new Tuple<int, int>(Circles[arrayIndex].Priority, arrayIndex));
+                        }
+                    }
+                    else
+                    {
+                        //POなら先頭処理は終了 Qから取り出す
+                        if(outs[0] == 0) { break; }
+
+                        arrayIndex = indexDict[outs[0]];
+                        path = new Tuple<int, int>(Circles[arrayIndex].Priority, arrayIndex);
+                    }
+                } while (true);
+            } while (routes.Count != 0);
 
             var result = new List<bool>(sortedIndex.Count);
             foreach (KeyValuePair<int, int> item in sortedIndex)
@@ -219,6 +281,7 @@ namespace CircuitSimulator
             var result = new BlockingCollection<bool>();
             //すべての故障個所が発見できたか走査する。
             Parallel.ForEach(faults, f =>
+            //foreach(var f in faults)
             {
                 var isDetect = false;
                 //全入力パターンを回して検出できるか試す。検出できたならそこで終了
@@ -233,7 +296,8 @@ namespace CircuitSimulator
                     if (cash[index] == f.FaultValue) { continue; }
 
                     //故障設定した状態でシミュレーション実行
-                    var simResult = SimulationSafe(f, cash);
+                    //var simResult = SimulationSafe(f, cash);
+                    var simResult = SimulationRouteSafe(f, cash);
 
                     //答え合わせ
                     for (int j = 0; j < answer.Count; j++)

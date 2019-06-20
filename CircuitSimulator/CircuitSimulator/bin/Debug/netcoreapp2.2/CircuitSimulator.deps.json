@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.2": {
-      "CircuitSimulator/2.0.4": {
+      "CircuitSimulator/2.1.1": {
         "runtime": {
           "CircuitSimulator.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "CircuitSimulator/2.0.4": {
+    "CircuitSimulator/2.1.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

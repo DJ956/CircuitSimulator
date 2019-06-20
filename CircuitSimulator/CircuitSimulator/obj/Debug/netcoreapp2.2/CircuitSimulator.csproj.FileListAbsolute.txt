@@ -8,3 +8,14 @@ H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug
 H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.AssemblyInfo.cs
 H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.dll
 H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.pdb
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Debug\netcoreapp2.2\CircuitSimulator.deps.json
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Debug\netcoreapp2.2\CircuitSimulator.runtimeconfig.json
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Debug\netcoreapp2.2\CircuitSimulator.runtimeconfig.dev.json
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Debug\netcoreapp2.2\CircuitSimulator.dll
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\bin\Debug\netcoreapp2.2\CircuitSimulator.pdb
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.csprojAssemblyReference.cache
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.csproj.CoreCompileInputs.cache
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.AssemblyInfoInputs.cache
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.AssemblyInfo.cs
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.dll
+C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.pdb

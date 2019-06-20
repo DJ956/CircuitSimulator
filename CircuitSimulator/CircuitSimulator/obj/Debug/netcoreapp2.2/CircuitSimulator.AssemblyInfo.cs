@@ -13,11 +13,11 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("E&K")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.4.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.4")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.1.1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.1.1")]
 [assembly: System.Reflection.AssemblyProductAttribute("CircuitSimulator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CircuitSimulator")]
-[assembly: System.Reflection.AssemblyVersionAttribute("2.0.4.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("2.1.1.0")]
 
 // MSBuild WriteCodeFragment クラスによって生成されました。
 

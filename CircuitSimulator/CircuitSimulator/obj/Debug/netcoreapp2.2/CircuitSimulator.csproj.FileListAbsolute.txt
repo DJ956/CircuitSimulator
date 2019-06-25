@@ -19,3 +19,4 @@ C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreap
 C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.AssemblyInfo.cs
 C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.dll
 C:\Github\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.pdb
+H:\Documents\GitHub\CircuitSimulator\CircuitSimulator\CircuitSimulator\obj\Debug\netcoreapp2.2\CircuitSimulator.csprojAssemblyReference.cache

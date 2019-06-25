@@ -186,9 +186,9 @@ namespace CircuitSimulator
         /// <param name="pattern"></param>
         /// <param name="fault"></param>
         /// <returns></returns>
-        private List<bool> SimulationSafe(CircleFault fault, List<bool> cash)
+        private List<bool> SimulationSafe(CircleFault fault, List<bool> cash, List<bool> faultCash)
         {
-            var faultCash = new List<bool>(cash);
+            //var faultCash = new List<bool>(cash);
                                    
             var faultArrayIndex = indexDict[fault.FaultIndex];
             faultCash[faultArrayIndex] = fault.FaultValue;
@@ -207,9 +207,9 @@ namespace CircuitSimulator
             return result;
         }
 
-        private List<bool> SimulationRouteSafe(CircleFault fault, List<bool> cash)
+        private List<bool> SimulationRouteSafe(CircleFault fault, List<bool> cash, List<bool> faultCash)
         {
-            var faultCash = new List<bool>(cash);
+            //var faultCash = new List<bool>(cash);
             var arrayIndex = indexDict[fault.FaultIndex];
 
             faultCash[arrayIndex] = fault.FaultValue;
@@ -280,8 +280,8 @@ namespace CircuitSimulator
         {
             var result = new BlockingCollection<bool>();
             //すべての故障個所が発見できたか走査する。
-            Parallel.ForEach(faults, f =>
-            //foreach(var f in faults)
+            //Parallel.ForEach(faults, f =>
+            foreach(var f in faults)
             {
                 var isDetect = false;
                 //全入力パターンを回して検出できるか試す。検出できたならそこで終了
@@ -296,8 +296,9 @@ namespace CircuitSimulator
                     if (cash[index] == f.FaultValue) { continue; }
 
                     //故障設定した状態でシミュレーション実行
-                    //var simResult = SimulationSafe(f, cash);
-                    var simResult = SimulationRouteSafe(f, cash);
+                    var faultCash = new List<bool>(cash);
+                    //var simResult = SimulationSafe(f, cash, faultCash);
+                    var simResult = SimulationRouteSafe(f, cash, faultCash);
 
                     //答え合わせ
                     for (int j = 0; j < answer.Count; j++)
@@ -310,11 +311,22 @@ namespace CircuitSimulator
                     }
 
                     //検知できていれば入力パターン走査を終了する
-                    if (isDetect) { break; }
+                    //if (isDetect) { break; }                    
+                    if(isDetect && f.FaultIndex == 170) {
+                        Console.WriteLine(i);
+                        
+                        for(int r =0; r < Circles.Count; r++)
+                        {
+                            Circles[r].Value = faultCash[r];
+                        }
+                        DataIO.SaveCircleDataAsync(Circles, $"cs9234_fault_{f.FaultIndex}_{f.FaultValue}_p{i}.txt").Wait();
+                        //DataIO.SaveCircleDataAsync(Circles, $"cs9234_normal_{f.FaultIndex}_{f.FaultValue}_p{i}.txt").Wait();
+                        break;
+                    }
                 }
                 //検出可不可を保存
                 result.TryAdd(isDetect);
-            });
+            }//);
 
             return result;
         }

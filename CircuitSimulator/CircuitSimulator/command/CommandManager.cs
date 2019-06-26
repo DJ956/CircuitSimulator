@@ -11,15 +11,14 @@ namespace CircuitSimulator.command
         public CommandManager()
         {
             commands = new List<ICommand>();
-            commands.Add(new StandAloneCommand());
-            commands.Add(new ServerCommand());
-            commands.Add(new ClientCommand());
+            commands.Add(new AsyncCommand());
+            commands.Add(new UnAsyncCommand());
             commands.Add(new ExitCommand());
         }
 
         public void Execute()
         {
-            Console.WriteLine("サーバーとして実行:(s) クライアントとして実行:(c) 自機のみで実行:(sa) 終了:(ex)");
+            Console.WriteLine("並列化実行:(as) 普通に実行:(un) 終了:(ex)");
             var key = Console.ReadLine();
 
             foreach (var command in commands)
@@ -47,6 +46,19 @@ namespace CircuitSimulator.command
             //Console.WriteLine($"故障シミュレーション結果を{Path.Combine(DataIO.ROOT, outputFileName)}に保存しました");
         }
 
+        /// <summary>
+        /// 論理シミュレータを実行する
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="faultName"></param>
+        /// <param name="patternName"></param>
+        /// <param name="circles"></param>
+        /// <param name="patternes"></param>
+        /// <param name="answers"></param>
+        /// <param name="faults"></param>
+        /// <param name="pathFinder"></param>
+        /// <param name="builder"></param>
+        /// <param name="outSideInputs"></param>
         public static void Initialize(string tableName, string faultName, string patternName,
             out List<CircleData> circles, out CirclePatternes patternes, out List<List<bool>> answers, out List<CircleFault> faults,
             out CircuitPathFinder pathFinder, out CircleDataBuilder builder, out CircleOutSideInputs outSideInputs)

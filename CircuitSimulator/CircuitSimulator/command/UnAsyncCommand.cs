@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace CircuitSimulator.command
 {
-    public class StandAloneCommand : ICommand
+    public class UnAsyncCommand : ICommand
     {
-        public StandAloneCommand() { }
+        public UnAsyncCommand() { }
 
         public void Execute()
         {
@@ -24,23 +24,25 @@ namespace CircuitSimulator.command
             CircuitPathFinder pathFinder;
             CircleDataBuilder builder;
             CircleOutSideInputs outSideInputs;
+
+            var start = DateTime.Now;
+
             CommandManager.Initialize(tableName, faultName, patternName,
                 out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder, out outSideInputs);
 
-            var start = DateTime.Now;
             //故障シミュレーション実行            
-            var faultResults = pathFinder.FaultSimulatorAsync(answers, faults);            
+            var faultResults = pathFinder.FaultSimulator(answers, faults);
             var end = DateTime.Now;
             Console.WriteLine($"処理時間:{(end - start).TotalSeconds}/s");
 
             var detectCount = faultResults.Count(f => f == true);
 
-            CommandManager.SaveResult(tableName, circles, answers, faults.Count, detectCount);            
+            CommandManager.SaveResult(tableName, circles, answers, faults.Count, detectCount);
         }
 
         public string GetCommandType()
         {
-            return "sa";
+            return "un";
         }
     }
 }

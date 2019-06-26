@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace CircuitSimulator
@@ -20,6 +21,7 @@ namespace CircuitSimulator
         public T Peek() { return list[0]; }
         public int Count { get { return list.Count; } }
         public T this[int i] { get { return list[i]; } set { list[i] = value; } }
+        public bool Any() { return list.Any(); }
     }
 
 }

@@ -1,12 +1,12 @@
-﻿using CircuitSimulator.worker;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CircuitSimulator.command
 {
-    public class ServerCommand : ICommand
+    public class AsyncCommand : ICommand
     {
-        public ServerCommand() { }
+        public AsyncCommand() { }
 
         public void Execute()
         {
@@ -15,13 +15,8 @@ namespace CircuitSimulator.command
             var tableName = fileName + ".tbl";
             var patternName = fileName + ".pat";
             var faultName = fileName + "f.rep";
-            Console.WriteLine("----------------------------------------");
 
-            Console.WriteLine("ポートを設定してください");
-            var port = int.Parse(Console.ReadLine());
-            Console.WriteLine("ワーカ数を入力してください");
-            var workerCount = int.Parse(Console.ReadLine());
-
+            //データ入力
             List<CircleData> circles;
             CirclePatternes circlePatternes;
             List<List<bool>> answers;
@@ -30,28 +25,24 @@ namespace CircuitSimulator.command
             CircleDataBuilder builder;
             CircleOutSideInputs outSideInputs;
 
+            var start = DateTime.Now;
+
             CommandManager.Initialize(tableName, faultName, patternName,
                 out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder, out outSideInputs);
 
-            var detectCount = -1;
-            try
-            {
-                var manager = new WorkerManager(port, workerCount, answers, circles, circlePatternes, faults, outSideInputs);
-                detectCount = manager.StartAsync().Result;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.StackTrace);
-                Environment.Exit(-1);
-            }
+            //故障シミュレーション実行            
+            var faultResults = pathFinder.FaultSimulatorAsync(answers, faults);
+            var end = DateTime.Now;
+            Console.WriteLine($"処理時間:{(end - start).TotalSeconds}/s");
+
+            var detectCount = faultResults.Count(f => f == true);
 
             CommandManager.SaveResult(tableName, circles, answers, faults.Count, detectCount);
         }
 
         public string GetCommandType()
         {
-            return "s";
+            return "as";
         }
     }
 }

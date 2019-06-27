@@ -22,13 +22,12 @@ namespace CircuitSimulator.gate
             gates.Add(PI.GetInstance());
             gates.Add(PO.GetInstance());           
             */
-            gates = new Dictionary<CircuitType, IGate>(9);
+            gates = new Dictionary<CircuitType, IGate>(8);
             gates.Add(CircuitType.PI, PI.GetInstance());
             gates.Add(CircuitType.PO, PO.GetInstance());
             gates.Add(CircuitType.AND, AND.GetInsctance());
             gates.Add(CircuitType.branch, Branch.GetInstance());
             gates.Add(CircuitType.EXOR, EXOR.GetInstance());
-            gates.Add(CircuitType.FF, FF.GetInstance());
             gates.Add(CircuitType.NAND, NAND.GetInstance());
             gates.Add(CircuitType.NOR, NOR.GetInstance());
             gates.Add(CircuitType.NOT, NOT.GetInstance());
@@ -61,19 +60,6 @@ namespace CircuitSimulator.gate
         {
             //return gates.Find(g => g.GetCircuitType() == circuitType).Execute(inputs);
             return gates[circuitType].Execute(inputs);            
-        }
-
-        /// <summary>
-        /// 等価故障が発生しているか判断する。
-        /// </summary>
-        /// <param name="circuitType">ゲートの種類</param>
-        /// <param name="normalInputs">正常時での入力値</param>
-        /// <param name="faultInputs">故障時での入力値</param>
-        /// <returns></returns>
-        public static bool EquivalentFailure(CircuitType circuitType, bool[] normalInputs, bool[] faultInputs)
-        {
-            //return gates.Find(g => g.GetCircuitType() == circuitType).EquivalentFailure(normalInputs, faultInputs);
-            return gates[circuitType].EquivalentFailure(normalInputs, faultInputs);            
         }
     }
 }

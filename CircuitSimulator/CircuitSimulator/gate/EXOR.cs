@@ -29,10 +29,5 @@ namespace CircuitSimulator.gate
         public CircuitType GetCircuitType() { return CircuitType.EXOR; }
 
         public static IGate GetInstance() { return eXOR; }
-
-        public bool EquivalentFailure(bool[] normalInputs, bool[] faultInputs)
-        {
-            return Execute(normalInputs) == Execute(faultInputs);
-        }
     }
 }

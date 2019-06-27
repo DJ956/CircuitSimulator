@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace CircuitSimulator
@@ -34,9 +33,10 @@ namespace CircuitSimulator
                     var circleRaw = await LoadCircleFromTxtAsync(reader);
                     var inputs = await LoadCircleInputFromTxtAsync(reader);
                     var outsideInputs = await LoadCircleOutSideInputsFromTxtAsync(reader);
-                    var outsideOutputs = await LoadCircleOutsideOutputsFromTxtAsync(reader);
+                    //var outsideOutputs = await LoadCircleOutsideOutputsFromTxtAsync(reader);
 
-                    result = new CirclesRawData(circleRaw, inputs, outsideInputs, outsideOutputs);
+                    //result = new CirclesRawData(circleRaw, inputs, outsideInputs, outsideOutputs);
+                    result = new CirclesRawData(circleRaw, inputs, outsideInputs);
                 }
             }
             catch (IOException ex)
@@ -45,7 +45,7 @@ namespace CircuitSimulator
                 Console.WriteLine(ex.StackTrace);
                 Environment.Exit(-1);
             }
-            catch(FormatException ex)
+            catch (FormatException ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
@@ -71,7 +71,7 @@ namespace CircuitSimulator
                     result = new List<CircleFault>(count);
                     for (int i = 0; i < count; i++)
                     {
-                        var line = await reader.ReadLineAsync();                        
+                        var line = await reader.ReadLineAsync();
                         var matches = Regex.Matches(line, PATTERN);
                         var faultIndex = int.Parse(matches[0].Value);
                         var faultValue = matches[1].Value == "1" ? true : false;
@@ -114,7 +114,7 @@ namespace CircuitSimulator
             for (int i = 0; i < count; i++)
             {
                 var line = await reader.ReadLineAsync();
-                
+
                 var matches = Regex.Matches(line, PATTERN);
                 var row = new List<int>(matches.Count);
                 foreach (Match m in matches)
@@ -171,7 +171,7 @@ namespace CircuitSimulator
         private async static Task<List<int>> LoadCircleOutsideOutputsFromTxtAsync(StreamReader reader)
         {
             return await LoadCircleOutSideInputsFromTxtAsync(reader);
-        }      
+        }
 
         public async static Task<CirclePatternes> LoadCirclePatternesFromTxtAsync(string fileName, CircleOutSideInputs outSideInputs)
         {
@@ -184,9 +184,9 @@ namespace CircuitSimulator
                 {
                     var count = int.Parse(await reader.ReadLineAsync());
                     results = new List<Dictionary<int, int>>(count);
-                    
+
                     for (int i = 0; i < count; i++)
-                    {                        
+                    {
                         var line = await reader.ReadLineAsync();
                         line = line.TrimStart();
                         var lines = line.Split(split);
@@ -298,35 +298,6 @@ namespace CircuitSimulator
                 Environment.Exit(-1);
             }
         }
-
-        /// <summary>
-        /// Objectをバイナリーにシリアライズする
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static byte[] Serialize(object obj)
-        {
-            var binary = new BinaryFormatter();
-            using (var memory = new MemoryStream())
-            {
-                binary.Serialize(memory, obj);
-                memory.Seek(0, SeekOrigin.Begin);
-                return memory.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// バイナリー化されたシリアライズデータをObjectに直す
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static object Deserialize(byte[] data)
-        {
-            var binary = new BinaryFormatter();
-            using (var memory = new MemoryStream(data))
-            {
-                return binary.Deserialize(memory);
-            }
-        }
     }
+
 }

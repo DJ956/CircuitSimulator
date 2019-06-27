@@ -18,17 +18,14 @@ namespace CircuitSimulator.command
 
             //データ入力
             List<CircleData> circles;
-            CirclePatternes circlePatternes;
             List<List<bool>> answers;
             List<CircleFault> faults;
             CircuitPathFinder pathFinder;
-            CircleDataBuilder builder;
-            CircleOutSideInputs outSideInputs;
 
             var start = DateTime.Now;
 
             CommandManager.Initialize(tableName, faultName, patternName,
-                out circles, out circlePatternes, out answers, out faults, out pathFinder, out builder, out outSideInputs);
+                out circles, out answers, out faults, out pathFinder);
 
             //故障シミュレーション実行            
             var faultResults = pathFinder.FaultSimulator(answers, faults);

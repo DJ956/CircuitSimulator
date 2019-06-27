@@ -26,5 +26,12 @@ namespace CircuitSimulator
             CirclesOutSideOutputs = new CircleOutsideOutputs(outsideOutputs);
         }
 
+        public CirclesRawData(List<List<int>> circleRawlist, List<int> inputs, List<int> outsideInputs)
+        {
+            CircleRawlist = circleRawlist;
+            CircleInputs = new CircleInputs(inputs);
+            CircleOutSideInputs = new CircleOutSideInputs(outsideInputs);
+        }
+
     }
 }

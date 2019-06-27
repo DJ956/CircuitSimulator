@@ -21,10 +21,5 @@ namespace CircuitSimulator.gate
             }
             return false;
         }
-
-        public bool EquivalentFailure(bool[] normalInputs, bool[] faultInputs)
-        {
-            return Execute(normalInputs) == Execute(faultInputs);
-        }
     }
 }

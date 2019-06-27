@@ -53,28 +53,25 @@ namespace CircuitSimulator.command
         /// <param name="faultName"></param>
         /// <param name="patternName"></param>
         /// <param name="circles"></param>
-        /// <param name="patternes"></param>
         /// <param name="answers"></param>
         /// <param name="faults"></param>
         /// <param name="pathFinder"></param>
-        /// <param name="builder"></param>
-        /// <param name="outSideInputs"></param>
         public static void Initialize(string tableName, string faultName, string patternName,
-            out List<CircleData> circles, out CirclePatternes patternes, out List<List<bool>> answers, out List<CircleFault> faults,
-            out CircuitPathFinder pathFinder, out CircleDataBuilder builder, out CircleOutSideInputs outSideInputs)
+            out List<CircleData> circles, out List<List<bool>> answers, out List<CircleFault> faults,
+            out CircuitPathFinder pathFinder)
         {
-            builder = new CircleDataBuilder();
+            var builder = new CircleDataBuilder();
 
             var circleRawData = DataIO.LoadTableAsync(tableName).Result;
             var circleInputs = circleRawData.CircleInputs;
             circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
             faults = DataIO.LoadCircleFaultsFromTxtAsync(faultName).Result;
-            outSideInputs = circleRawData.CircleOutSideInputs;
+            var outSideInputs = circleRawData.CircleOutSideInputs;
 
             pathFinder = new CircuitPathFinder(circles, outSideInputs);
 
             //シミュレーション実行&結果出力            
-            patternes = DataIO.LoadCirclePatternesFromTxtAsync(patternName, circleRawData.CircleOutSideInputs).Result;
+            var patternes = DataIO.LoadCirclePatternesFromTxtAsync(patternName, circleRawData.CircleOutSideInputs).Result;
             answers = new List<List<bool>>(patternes.Patternes.Count);
 
             foreach (var p in patternes.Patternes)

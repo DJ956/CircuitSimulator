@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CircuitSimulator
 {
@@ -121,50 +120,6 @@ namespace CircuitSimulator
             }
             //優先順位決定
             DetectPriority(result);
-            return result;
-        }
-
-        /// <summary>
-        /// 故障個所から外部出力に至るまでの経路を生成する
-        /// </summary>
-        /// <param name="circles"></param>
-        /// <param name="fault"></param>
-        /// <returns>Keyが回路Index Valueが回路Indexの経路</returns>
-        public Dictionary<CircleFault, List<int>> CreateFaultPath(List<CircleData> circles, List<CircleFault> faults)
-        {            
-            var fs = faults.Distinct().ToList();
-            var result = new Dictionary<CircleFault, List<int>>(fs.Count);
-            Parallel.ForEach(fs, f =>{
-                //foreach(var f in fs) { 
-
-                var faultCircle = circles.Find(c => c.Index == f.FaultIndex);
-                var outputs = faultCircle.Outs;
-
-                var tasks = new Queue<int>();
-                tasks.Enqueue(f.FaultIndex);
-                foreach (var o in outputs) { tasks.Enqueue(o); }
-
-                var paths = new List<int>();
-
-                do
-                {
-                    var faultIndex = tasks.Dequeue();
-                    paths.Add(faultIndex);
-                    faultCircle = circles.Find(c => c.Index == faultIndex);
-
-                    if(faultCircle.CircuitType == CircuitType.PO) { continue; }
-
-                    foreach (var fo in faultCircle.Outs) { tasks.Enqueue(fo); }
-                    //} while (faultCircle.CircuitType != CircuitType.PO);
-                } while (tasks.Any());
-
-                //重複を削除
-                var sorted = paths.Distinct().ToList();
-
-                lock (result){result.Add(f, sorted);}
-                //result.Add(f.FaultIndex, sorted);
-            });
-
             return result;
         }
 

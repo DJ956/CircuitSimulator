@@ -139,7 +139,7 @@ namespace CircuitSimulator
         private void DetectValueSafe(List<bool> faultCash, int i, CircleFault fault)
         {
             var c = Circles[i];
-            var type = Circles[i].CircuitType;            
+            var type = c.CircuitType;            
             var inputs = GetInputsSafe(faultCash, i);
             faultCash[i] = GateFunctions.Execute(type, inputs, c, fault);
         }
@@ -227,13 +227,13 @@ namespace CircuitSimulator
             {
                 path = routes.Dequeue();
                 //先頭の伝搬が終わるまでやる
-
-                if (Circles[path.Item2].CircuitType != CircuitType.PI)
+                var c = Circles[path.Item2];
+                if (c.CircuitType != CircuitType.PI)
                 {
                     DetectValueSafe(faultCash, path.Item2, fault);
                 }
                 //ヘッドがPOかつ伝搬すれば検出可能
-                if (Circles[path.Item2].CircuitType == CircuitType.PO && faultCash[path.Item2] != cash[path.Item2])
+                if (c.CircuitType == CircuitType.PO && faultCash[path.Item2] != cash[path.Item2])
                 {
                     detect = true;
                     break;
@@ -242,11 +242,11 @@ namespace CircuitSimulator
                 if (faultCash[path.Item2] == cash[path.Item2]) { continue; }
 
                 //伝搬すれば
-                var outs = Circles[path.Item2].Outs;
+                var outs = c.Outs;
                 foreach (var o in outs)
                 {
                     arrayIndex = indexDict[o];
-                    var item = new Tuple<int, int>(Circles[arrayIndex].Priority, arrayIndex);
+                    var item = new Tuple<int, int>(c.Priority, arrayIndex);
                     routes.Enqueue(item);
                 }
 

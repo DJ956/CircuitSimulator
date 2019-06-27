@@ -3,15 +3,14 @@ using CircuitSimulator.gate;
 
 namespace CircuitSimulator
 {
-    [Serializable]
     public class CircleData
     {
-        public int Index { get; set; }
-        public CircuitType CircuitType { get; set; }
-        public bool Already { get; set; } = false;
+        public int Index { get; private set; }
+        public CircuitType CircuitType { get; private set; }
+        public bool Already { get; private set; } = false;
         public bool Value { get; set; } = false;
-        public int[] Inputs { get; set; }
-        public int[] Outs { get; set; }
+        public int[] Inputs { get; private set; }
+        public int[] Outs { get; private set; }
 
         private int priority = -1;
         public int Priority
@@ -23,8 +22,6 @@ namespace CircuitSimulator
                 Already = true;
             }
         }
-
-        public CircleData() { }
 
         public CircleData(int index, CircuitType type, int[] inputs, int[] outs)
         {

@@ -19,38 +19,38 @@ namespace CircuitSimulator
         /// 演算順序の優先度を決定する
         /// </summary>
         /// <param name="circles"></param>
-        private void DetectPriority(List<CircleData> circles)
+        private void DetectPriority(CircleData[] circles)
         {
-            var priority = new Queue<int>(Enumerable.Range(0, circles.Count));
+            var priority = new Queue<int>(Enumerable.Range(0, circles.Length));
 
             do
             {               
-                foreach (var c in circles)
+                for (int i = 0; i < circles.Length; i++)
                 {
-                    if (c.Already) { continue; }                    
+                    if (circles[i].Already) { continue; }                    
                     //PI                    
-                    if (c.CircuitType == CircuitType.PI)
+                    if (circles[i].CircuitType == CircuitType.PI)
                     {
-                        c.Priority = priority.Dequeue();
+                        circles[i].Priority = priority.Dequeue();
                         continue;
                     }
 
-                    var inputs = c.Inputs;
+                    var inputs = circles[i].Inputs;
                     //入力が1つのみの場合
                     if (inputs.Length == 1)
                     {
                         var index = inputs[0] - 1;
                         //入力が1ならば優先順位を割り当てる
-                        if (circles[index].Priority != -1) { c.Priority = priority.Dequeue(); }
+                        if (circles[index].Priority != -1) { circles[i].Priority = priority.Dequeue(); }
 
                     }//入力が2つ以上の場合
                     else
                     {
                         var allAlready = true;
                         //全ての入力線が演算順序決定済みか調べる。
-                        for (int i = 0; i < inputs.Length; i++)
+                        for (int j = 0; j < inputs.Length; j++)
                         {
-                            var index = inputs[i] - 1;
+                            var index = inputs[j] - 1;
                             if (!circles[index].Already)
                             {
                                 allAlready = false;
@@ -58,14 +58,14 @@ namespace CircuitSimulator
                             }
                         }
                         //全ての入力線が順序決定済みの場合
-                        if (allAlready) { c.Priority = priority.Dequeue(); }
+                        if (allAlready) { circles[i].Priority = priority.Dequeue(); }
                     }
 
                 }
             } while (priority.Count != 0);
 
             //最後に優先順序ごとにソートする
-            circles.Sort((a, b) => a.Priority - b.Priority);
+            Array.Sort(circles, (a, b) => a.Priority - b.Priority);
         }
 
 
@@ -74,49 +74,49 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public List<CircleData> BuildCircles(List<List<int>> circleRaw, CircleInputs circleInputs)
+        public CircleData[] BuildCircles(int[,] circleRaw, CircleInputs circleInputs)
         {
             var data = circleRaw;
-            var result = new List<CircleData>(data.Count);
+
+            var result = new CircleData[data.GetLength(0)];
 
             var index = 1;
-            foreach (var list in data)
+            for (int i = 0; i < data.GetLength(0); i++)
             {
-                var type = CircleTypeDict.GetType(list[TYPE_INDEX]);
+                var type = CircleTypeDict.GetType(data[i, TYPE_INDEX]);
                 int[] inputs = null;
                 int[] outs = null;
 
-                var inputCount = list[INPUT_COUNT_INDEX];
+                var inputCount = data[i, INPUT_COUNT_INDEX];
                 //2以上の時、リスト２に示される番号の信号線が入力
                 if (inputCount > 1)
                 {
                     inputs = new int[inputCount];
-                    var start = list[INPUT_INDEX] - 1;
-                    for (int i = 0; i < inputCount; i++)
+                    var start = data[i, INPUT_INDEX] - 1;
+                    for (int j = 0; j < inputCount; j++)
                     {
-                        inputs[i] = circleInputs.Inputs[start + i];                        
+                        inputs[j] = circleInputs.Inputs[start + j];                        
                     }
                 }//1の時、3列目は入力数を示す
-                else { inputs = new int[1] { list[INPUT_INDEX] }; }
+                else { inputs = new int[1] { data[i, INPUT_INDEX] }; }
 
-                var outCount = list[OUT_COUNT_INDEX];
+                var outCount = data[i, OUT_COUNT_INDEX];
                 //２以上の時、リスト２に示される信号線が出力
                 if (outCount > 1)
                 {
                     outs = new int[outCount];
-                    var start = list[OUT_INDEX] - 1;
-                    for (int i = 0; i < outCount; i++)
+                    var start = data[i, OUT_INDEX] - 1;
+                    for (int j = 0; j < outCount; j++)
                     {
-                        outs[i] = circleInputs.Inputs[start + i];
+                        outs[j] = circleInputs.Inputs[start + j];
                     }
                 }//1の時、５列目は出力数を示す
-                else { outs = new int[1] { list[OUT_INDEX] }; }
+                else { outs = new int[1] { data[i, OUT_INDEX] }; }
 
-                var circle = new CircleData(index, type, inputs, outs);
-                result.Add(circle);
+
+                result[i] = new CircleData(index, type, inputs, outs);
 
                 index++;
-
             }
             //優先順位決定
             DetectPriority(result);

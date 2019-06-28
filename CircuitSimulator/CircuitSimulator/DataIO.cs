@@ -59,16 +59,16 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task<List<CircleFault>> LoadCircleFaultsFromTxtAsync(string fileName)
+        public async static Task<CircleFault[]> LoadCircleFaultsFromTxtAsync(string fileName)
         {
-            List<CircleFault> result = null;
+            CircleFault[] result = null;
             var path = Path.Combine(ROOT, fileName);
             try
             {
                 using (var reader = new StreamReader(path, false))
                 {
                     var count = int.Parse(await reader.ReadLineAsync());
-                    result = new List<CircleFault>(count);
+                    result = new CircleFault[count];
                     for (int i = 0; i < count; i++)
                     {
                         var line = await reader.ReadLineAsync();
@@ -76,7 +76,7 @@ namespace CircuitSimulator
                         var faultIndex = int.Parse(matches[0].Value);
                         var faultValue = matches[1].Value == "1" ? true : false;
 
-                        result.Add(new CircleFault(faultIndex, faultValue));
+                        result[i] = new CircleFault(faultIndex, faultValue);
                     }
                 }
             }
@@ -95,9 +95,9 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private async static Task<List<List<int>>> LoadCircleFromTxtAsync(StreamReader reader)
+        private async static Task<int[,]> LoadCircleFromTxtAsync(StreamReader reader)
         {
-            List<List<int>> result = null;
+            int[,] result = null;
 
             var count = -1;
 
@@ -109,21 +109,20 @@ namespace CircuitSimulator
             //空文字でなければそれはカウントなので設定する。
             else { count = int.Parse(first); }
 
-            result = new List<List<int>>(count);
+            result = new int[count, 5];
 
             for (int i = 0; i < count; i++)
             {
                 var line = await reader.ReadLineAsync();
 
                 var matches = Regex.Matches(line, PATTERN);
-                var row = new List<int>(matches.Count);
-                foreach (Match m in matches)
+
+                for(int j = 0; j < matches.Count; j++)
                 {
-                    row.Add(int.Parse(m.Value));
+                    var m = matches[j];
+                    result[i, j] = int.Parse(m.Value);
                 }
-
-                result.Add(row);
-
+                
             }
             return result;
         }
@@ -133,21 +132,21 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="inputs"></param>
-        private async static Task<List<int>> LoadCircleInputFromTxtAsync(StreamReader reader)
+        private async static Task<int[]> LoadCircleInputFromTxtAsync(StreamReader reader)
         {
-            List<int> result = null;
+            int[] result = null;
             //最初の空行を読み飛ばす
             await reader.ReadLineAsync();
 
             var count = int.Parse(await reader.ReadLineAsync());
-            result = new List<int>(count);
+            result = new int[count];
             for (int i = 0; i < count; i++)
             {
                 var line = await reader.ReadLineAsync();
                 line = line.TrimStart();
 
                 var data = int.Parse(line);
-                result.Add(data);
+                result[i] = data;
             }
 
             return result;
@@ -158,7 +157,7 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private async static Task<List<int>> LoadCircleOutSideInputsFromTxtAsync(StreamReader reader)
+        private async static Task<int[]> LoadCircleOutSideInputsFromTxtAsync(StreamReader reader)
         {
             return await LoadCircleInputFromTxtAsync(reader);
         }
@@ -168,7 +167,7 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private async static Task<List<int>> LoadCircleOutsideOutputsFromTxtAsync(StreamReader reader)
+        private async static Task<int[]> LoadCircleOutsideOutputsFromTxtAsync(StreamReader reader)
         {
             return await LoadCircleOutSideInputsFromTxtAsync(reader);
         }
@@ -215,7 +214,7 @@ namespace CircuitSimulator
         /// <param name="circles"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async static Task SaveCircleDataAsync(List<CircleData> circles, string fileName)
+        public async static Task SaveCircleDataAsync(CircleData[] circles, string fileName)
         {
             var path = Path.Combine(ROOT, fileName);
             try

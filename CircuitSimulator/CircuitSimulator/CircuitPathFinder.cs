@@ -1,7 +1,6 @@
 ﻿using CircuitSimulator.gate;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
@@ -14,12 +13,12 @@ namespace CircuitSimulator
         /// </summary>
         /// <param name="circles"></param>
         /// <param name="outSideInputs">外部入力</param>
-        public CircuitPathFinder(List<CircleData> circles, CircleOutSideInputs outSideInputs)
+        public CircuitPathFinder(CircleData[] circles, CircleOutSideInputs outSideInputs)
         {
             Circles = circles;
-            indexDict = new Dictionary<int, int>(circles.Count);
+            indexDict = new Dictionary<int, int>(circles.Length);
             sortedIndex = new SortedDictionary<int, int>();
-            for (int i = 0; i < circles.Count; i++)
+            for (int i = 0; i < circles.Length; i++)
             {
                 var c = Circles[i];
                 indexDict.Add(c.Index, i);
@@ -28,17 +27,9 @@ namespace CircuitSimulator
                     sortedIndex.Add(c.Inputs[0], i);
                 }
             }
-
-            var pilist = new List<int>(outSideInputs.OutSideInputs.Count);
-            foreach (var piIndex in outSideInputs.OutSideInputs)
-            {
-                pilist.Add(indexDict[piIndex]);
-            }
-
-            withoutPiIndexlist = Enumerable.Range(0, circles.Count).Where(index => !pilist.Contains(index)).ToList();
         }
 
-        public List<CircleData> Circles { get; private set; }
+        public CircleData[] Circles { get; private set; }
 
         /// <summary>
         /// POのソートされた配列Indexリスト
@@ -54,11 +45,6 @@ namespace CircuitSimulator
         /// 回路データの値のキャッシュ
         /// </summary>
         private List<List<bool>> circleValuesCash;
-
-        /// <summary>
-        /// PI以外の配列Indexのシーケンス
-        /// </summary>
-        private List<int> withoutPiIndexlist;
 
         /// <summary>
         /// 入力パターン選択,CircleDataのValueの初期化
@@ -155,8 +141,8 @@ namespace CircuitSimulator
             Initialize(pattern);
             List<bool> cash = null;
 
-            if (saveCash) { cash = new List<bool>(Circles.Count); }
-            for (int i = 0; i < Circles.Count; i++)
+            if (saveCash) { cash = new List<bool>(Circles.Length); }
+            for (int i = 0; i < Circles.Length; i++)
             {
                 if (Circles[i].CircuitType != CircuitType.PI)
                 {
@@ -173,33 +159,6 @@ namespace CircuitSimulator
             }
             //キャッシュのリストの追加
             if (saveCash) { circleValuesCash.Add(cash); }
-
-            return result;
-        }
-
-        /// <summary>
-        /// スレッドセーフな故障シミュレーション
-        /// 故障個所から最後までシミュレーションを行う。
-        /// </summary>        
-        /// <param name="fault"></param>
-        /// <returns></returns>
-        private List<bool> SimulationSafe(CircleFault fault, List<bool> cash)
-        {
-            var faultCash = new List<bool>(cash);
-                                   
-            var faultArrayIndex = indexDict[fault.FaultIndex];
-            faultCash[faultArrayIndex] = fault.FaultValue;
-            foreach (var i in withoutPiIndexlist)
-            {
-                if (i < faultArrayIndex) { continue; }
-                DetectValueSafe(faultCash, i, fault);
-            }
-            
-            var result = new List<bool>(sortedIndex.Count);
-            foreach (KeyValuePair<int, int> item in sortedIndex)
-            {
-                result.Add(faultCash[item.Value]);
-            }
 
             return result;
         }
@@ -261,7 +220,7 @@ namespace CircuitSimulator
         /// <param name="answers">正常時の答えリスト</param>
         /// <param name="faults">故障リスト</param>
         /// <returns></returns>
-        public IEnumerable<bool> FaultSimulatorAsync(List<List<bool>> answers, List<CircleFault> faults)
+        public IEnumerable<bool> FaultSimulatorAsync(List<List<bool>> answers, CircleFault[] faults)
         {
             var result = new BlockingCollection<bool>();
             //すべての故障個所が発見できたか走査する。
@@ -298,9 +257,9 @@ namespace CircuitSimulator
         /// <param name="answers"></param>
         /// <param name="faults"></param>
         /// <returns></returns>
-        public IEnumerable<bool> FaultSimulator(List<List<bool>> answers, List<CircleFault> faults)
+        public IEnumerable<bool> FaultSimulator(List<List<bool>> answers, CircleFault[] faults)
         {
-            var result = new List<bool>(faults.Count);
+            var result = new List<bool>(faults.Length);
             //すべての故障個所が発見できたか走査する。            
             foreach (var f in faults)
             {

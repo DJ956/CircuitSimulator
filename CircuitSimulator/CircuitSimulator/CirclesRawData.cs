@@ -6,7 +6,7 @@ namespace CircuitSimulator
 {
     public class CirclesRawData
     {
-        public List<List<int>> CircleRawlist { get; private set; }
+        public int[,] CircleRawlist { get; private set; }
         public CircleInputs CircleInputs { get; private set; }
         public CircleOutSideInputs CircleOutSideInputs { get; private set; }
         public CircleOutsideOutputs CirclesOutSideOutputs { get; private set; }
@@ -18,7 +18,7 @@ namespace CircuitSimulator
         /// <param name="inputs">リスト2</param>
         /// <param name="outsideInputs">外部入力データ</param>
         /// <param name="outsideOutputs">外部出力データ</param>
-        public CirclesRawData(List<List<int>> circleRawlist, List<int> inputs, List<int> outsideInputs, List<int> outsideOutputs)
+        public CirclesRawData(int[,] circleRawlist, int[] inputs, int[] outsideInputs, int[] outsideOutputs)
         {
             CircleRawlist = circleRawlist;
             CircleInputs = new CircleInputs(inputs);
@@ -26,7 +26,7 @@ namespace CircuitSimulator
             CirclesOutSideOutputs = new CircleOutsideOutputs(outsideOutputs);
         }
 
-        public CirclesRawData(List<List<int>> circleRawlist, List<int> inputs, List<int> outsideInputs)
+        public CirclesRawData(int[,] circleRawlist, int[] inputs, int[] outsideInputs)
         {
             CircleRawlist = circleRawlist;
             CircleInputs = new CircleInputs(inputs);

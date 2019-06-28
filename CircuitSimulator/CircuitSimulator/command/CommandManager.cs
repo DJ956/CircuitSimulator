@@ -27,7 +27,7 @@ namespace CircuitSimulator.command
             }
         }
 
-        public static void SaveResult(string tableName, List<CircleData> circles, List<List<bool>> answers, int faultCount, int detectCount)
+        public static void SaveResult(string tableName, CircleData[] circles, List<List<bool>> answers, int faultCount, int detectCount)
         {
             Console.WriteLine($"故障数:{faultCount}");            
             Console.WriteLine($"故障検出数:{detectCount}");
@@ -57,7 +57,7 @@ namespace CircuitSimulator.command
         /// <param name="faults"></param>
         /// <param name="pathFinder"></param>
         public static void Initialize(string tableName, string faultName, string patternName,
-            out List<CircleData> circles, out List<List<bool>> answers, out List<CircleFault> faults,
+            out CircleData[] circles, out List<List<bool>> answers, out CircleFault[] faults,
             out CircuitPathFinder pathFinder)
         {
             var builder = new CircleDataBuilder();

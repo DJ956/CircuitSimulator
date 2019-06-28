@@ -3,16 +3,16 @@ using CircuitSimulator.gate;
 
 namespace CircuitSimulator
 {
-    public class CircleData
+    public struct CircleData
     {
         public int Index { get; private set; }
         public CircuitType CircuitType { get; private set; }
-        public bool Already { get; private set; } = false;
-        public bool Value { get; set; } = false;
+        public bool Already { get; private set; }
+        public bool Value { get; set; }
         public int[] Inputs { get; private set; }
         public int[] Outs { get; private set; }
 
-        private int priority = -1;
+        private int priority;
         public int Priority
         {
             get { return priority; }
@@ -29,6 +29,10 @@ namespace CircuitSimulator
             CircuitType = type;
             Inputs = inputs;
             Outs = outs;
+
+            Already = false;
+            Value = false;
+            priority = -1;
         }
 
         public CircleData(int index, CircuitType type, int[] inputs, int[] outs, int priotiry)
@@ -37,6 +41,11 @@ namespace CircuitSimulator
             CircuitType = type;
             Inputs = inputs;
             Outs = outs;
+
+            Already = false;
+            Value = false;
+            this.priority = -1;
+
             Priority = priotiry;
         }
 

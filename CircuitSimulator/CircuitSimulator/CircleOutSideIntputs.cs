@@ -5,8 +5,8 @@ namespace CircuitSimulator
 {
     public class CircleOutSideInputs
     {
-        public List<int> OutSideInputs { get; private set; }
+        public int[] OutSideInputs { get; private set; }
 
-        public CircleOutSideInputs(List<int> outsideInputs) { OutSideInputs = outsideInputs; }
+        public CircleOutSideInputs(int[] outsideInputs) { OutSideInputs = outsideInputs; }
     }
 }

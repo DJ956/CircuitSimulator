@@ -17,9 +17,9 @@ namespace CircuitSimulator.command
             var faultName = fileName + "f.rep";
 
             //データ入力
-            List<CircleData> circles;
+            CircleData[] circles;
             List<List<bool>> answers;
-            List<CircleFault> faults;
+            CircleFault[] faults;
             CircuitPathFinder pathFinder;
 
             var start = DateTime.Now;
@@ -34,7 +34,7 @@ namespace CircuitSimulator.command
 
             var detectCount = faultResults.Count(f => f == true);
 
-            CommandManager.SaveResult(tableName, circles, answers, faults.Count, detectCount);
+            CommandManager.SaveResult(tableName, circles, answers, faults.Length, detectCount);
         }
 
         public string GetCommandType()

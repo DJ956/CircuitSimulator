@@ -186,7 +186,10 @@ namespace CircuitSimulator
                 path = routes.Dequeue();
                 //先頭の伝搬が終わるまでやる
                 var c = Circles[path.Item2];
-                DetectValueSafe(faultCash, path.Item2, fault);
+                if (c.CircuitType != CircuitType.PI)
+                {
+                    DetectValueSafe(faultCash, path.Item2, fault);
+                }
                 //ヘッドがPOかつ伝搬すれば検出可能
                 if (c.CircuitType == CircuitType.PO && faultCash[path.Item2] != cash[path.Item2])
                 {

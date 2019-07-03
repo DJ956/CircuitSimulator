@@ -16,6 +16,9 @@ namespace CircuitSimulator.command
             var patternName = fileName + ".pat";
             var faultName = fileName + "f.rep";
 
+            Console.WriteLine("最大スレッド数を入力してください...");
+            var threadCount = int.Parse(Console.ReadLine());
+
             //データ入力
             CircleData[] circles;
             List<List<bool>> answers;
@@ -28,7 +31,7 @@ namespace CircuitSimulator.command
                 out circles, out answers, out faults, out pathFinder);
 
             //故障シミュレーション実行            
-            var faultResults = pathFinder.FaultSimulatorAsync(answers, faults);
+            var faultResults = pathFinder.FaultSimulatorAsync(answers, faults, threadCount);
             var end = DateTime.Now;
             Console.WriteLine($"処理時間:{(end - start).TotalSeconds}/s");
 

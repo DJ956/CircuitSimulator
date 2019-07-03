@@ -65,10 +65,9 @@ namespace CircuitSimulator.command
             var circleRawData = DataIO.LoadTableAsync(tableName).Result;
             var circleInputs = circleRawData.CircleInputs;
             circles = builder.BuildCircles(circleRawData.CircleRawlist, circleInputs);
-            faults = DataIO.LoadCircleFaultsFromTxtAsync(faultName).Result;
-            var outSideInputs = circleRawData.CircleOutSideInputs;
+            faults = DataIO.LoadCircleFaultsFromTxtAsync(faultName).Result;            
 
-            pathFinder = new CircuitPathFinder(circles, outSideInputs);
+            pathFinder = new CircuitPathFinder(circles);
 
             //シミュレーション実行&結果出力            
             var patternes = DataIO.LoadCirclePatternesFromTxtAsync(patternName, circleRawData.CircleOutSideInputs).Result;

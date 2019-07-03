@@ -12,8 +12,7 @@ namespace CircuitSimulator
         /// 答えソートリストを作成する
         /// </summary>
         /// <param name="circles"></param>
-        /// <param name="outSideInputs">外部入力</param>
-        public CircuitPathFinder(CircleData[] circles, CircleOutSideInputs outSideInputs)
+        public CircuitPathFinder(CircleData[] circles)
         {
             Circles = circles;
             indexDict = new Dictionary<int, int>(circles.Length);
@@ -187,10 +186,7 @@ namespace CircuitSimulator
                 path = routes.Dequeue();
                 //先頭の伝搬が終わるまでやる
                 var c = Circles[path.Item2];
-                if (c.CircuitType != CircuitType.PI)
-                {
-                    DetectValueSafe(faultCash, path.Item2, fault);
-                }
+                DetectValueSafe(faultCash, path.Item2, fault);
                 //ヘッドがPOかつ伝搬すれば検出可能
                 if (c.CircuitType == CircuitType.PO && faultCash[path.Item2] != cash[path.Item2])
                 {
@@ -220,11 +216,12 @@ namespace CircuitSimulator
         /// <param name="answers">正常時の答えリスト</param>
         /// <param name="faults">故障リスト</param>
         /// <returns></returns>
-        public IEnumerable<bool> FaultSimulatorAsync(List<List<bool>> answers, CircleFault[] faults)
+        public IEnumerable<bool> FaultSimulatorAsync(List<List<bool>> answers, CircleFault[] faults, int threadCount)
         {
             var result = new BlockingCollection<bool>();
+            var options = new ParallelOptions() { MaxDegreeOfParallelism = threadCount };
             //すべての故障個所が発見できたか走査する。
-            Parallel.ForEach(faults, f =>
+            Parallel.ForEach(faults, options, f =>
             {
                 var isDetect = false;
                 //全入力パターンを回して検出できるか試す。検出できたならそこで終了
